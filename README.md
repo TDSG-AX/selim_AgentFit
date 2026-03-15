@@ -2,7 +2,7 @@
 
 > 내 작업에 멀티에이전트가 맞는지 평가하고, AI와 대화로 아키텍처를 컨설팅받는 도구
 
-**GitHub Pages** → `https://tdsg-ax.github.io/selim_AgentFit/`
+**GitHub Pages** → `[https://tdsg-ax.github.io/selim_AgentFit/](https://tdsg-ax.github.io/selim_AgentFit/)`
 
 ---
 
