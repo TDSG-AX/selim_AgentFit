@@ -749,7 +749,7 @@ async function sendMsg() {
     typing.querySelector('.bub').innerHTML = reply.replace(/\n/g,'<br>');
     chatHistory.push({role:'assistant',content:reply});
   } catch(e) {
-    typing.querySelector('.bub').innerHTML = `<span style="color:var(--accent)">오류: ${e.message}</span>`;
+    typing.querySelector('.bub').innerHTML = `<span style="color:var(--accent)">오류: ${friendlyErr(e.message)}</span>`;
   }
   document.getElementById('send-btn').disabled=false;
   document.getElementById('chat-box').scrollTop=99999;
@@ -798,6 +798,16 @@ function buildSys() {
 - **5턴**: 최종 권고 — ①단일/멀티 결정 근거 ②추천 아키텍처 다이어그램 ③구현 시작점 3단계
 
 응답은 실용적·구체적으로. 이론 설명보다 "지금 어떻게 시작할지"에 집중하세요.`;
+}
+
+function friendlyErr(msg) {
+  if(!msg) return '알 수 없는 오류가 발생했습니다';
+  if(/quota|rate.?limit|429|free_tier/i.test(msg)) return 'API 할당량을 초과했습니다. 플랜·결제 정보를 확인하거나 잠시 후 다시 시도해주세요.';
+  if(/invalid.?api.?key|api_key|authentication|401/i.test(msg)) return 'API Key가 올바르지 않습니다. 설정에서 Key를 다시 확인해주세요.';
+  if(/model.?not.?found|unknown.?model|404/i.test(msg)) return '모델명이 올바르지 않습니다. 설정에서 모델명을 확인해주세요.';
+  if(/network|fetch|cors|failed to fetch/i.test(msg)) return '네트워크 오류입니다. 인터넷 연결 또는 Base URL을 확인해주세요.';
+  if(/context.?length|token|too.?long/i.test(msg)) return '입력이 너무 깁니다. 대화를 초기화 후 다시 시도해주세요.';
+  return msg;
 }
 
 async function callAI(messages) {
