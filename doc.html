@@ -269,7 +269,7 @@ body{font-family:'Gabarito',system-ui,sans-serif;background:var(--bg);color:var(
 .footer-link{font-size:12px;color:var(--text3);cursor:pointer;transition:color .15s;}
 .footer-link:hover{color:var(--text);}
 /* git timeline */
-.git-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r); padding: 20px; font-family: 'DM Mono', monospace; }
+.git-wrap { background: #ffffff; border: 0.5px solid var(--border); border-radius: var(--r); padding: 20px; font-family: 'DM Mono', monospace; }
 .git-timeline { position: relative; }
 .git-branch-row { display: flex; align-items: center; gap: 0; margin-bottom: 14px; position: relative; }
 .git-branch-row:last-child { margin-bottom: 0; }
@@ -460,14 +460,9 @@ body{font-family:'Gabarito',system-ui,sans-serif;background:var(--bg);color:var(
         </div>
         <div class="wt-desc">하나의 Git 저장소에서 여러 브랜치를 각각 다른 디렉토리에 동시에 체크아웃하는 기능. 에이전트마다 별도 작업 디렉토리를 부여해 충돌 없이 병렬 작업이 가능합니다.</div>
         <div class="code-block">
-<span class="cm"># 에이전트 A용 워크트리 생성</span>
-<span class="ck">git worktree add</span> <span class="cv">../agent-a</span> <span class="ca">feat/research</span>
-
-<span class="cm"># 에이전트 B용 워크트리 생성</span>
-<span class="ck">git worktree add</span> <span class="cv">../agent-b</span> <span class="ca">feat/analysis</span>
-
-<span class="cm"># 워크트리 목록 확인</span>
-<span class="ck">git worktree list</span>
+<div style="margin-bottom:8px"><div><span class="cm"># 에이전트 A용 워크트리 생성</span></div><div><span class="ck">git worktree add</span> <span class="cv">../agent-a</span> <span class="ca">feat/research</span></div></div>
+<div style="margin-bottom:8px"><div><span class="cm"># 에이전트 B용 워크트리 생성</span></div><div><span class="ck">git worktree add</span> <span class="cv">../agent-b</span> <span class="ca">feat/analysis</span></div></div>
+<div><div><span class="cm"># 워크트리 목록 확인</span></div><div><span class="ck">git worktree list</span></div></div>
         </div>
       </div>
       <div class="wt-card">
@@ -477,14 +472,8 @@ body{font-family:'Gabarito',system-ui,sans-serif;background:var(--bg);color:var(
         </div>
         <div class="wt-desc">오케스트레이터가 브랜치 전략을 설계하고, 각 서브에이전트는 전용 워크트리에서 독립 실행됩니다. 완료 후 PR → 코드 리뷰 → 메인 브랜치 병합.</div>
         <div class="code-block">
-<span class="cm"># 오케스트레이터가 전략 수립</span>
-main
-├── <span class="cv">feat/research</span>   ← 에이전트 A
-├── <span class="cv">feat/analysis</span>   ← 에이전트 B
-└── <span class="cv">feat/report</span>     ← 에이전트 C
-
-<span class="cm"># 완료 후 병합</span>
-<span class="ck">git merge</span> feat/research feat/analysis
+<div style="margin-bottom:8px"><div><span class="cm"># 오케스트레이터가 전략 수립</span></div><div>main</div><div>├── <span class="cv">feat/research</span>   ← 에이전트 A</div><div>├── <span class="cv">feat/analysis</span>   ← 에이전트 B</div><div>└── <span class="cv">feat/report</span>     ← 에이전트 C</div></div>
+<div><div><span class="cm"># 완료 후 병합</span></div><div><span class="ck">git merge</span> feat/research feat/analysis</div></div>
         </div>
       </div>
     </div>
@@ -537,64 +526,65 @@ main
     <div style="margin-top:16px;">
       <div class="sec-label" style="margin-bottom:14px;">Git Worktree × 에이전트 팀 타임라인</div>
       <div class="git-wrap">
-        <div class="git-timeline">
-          <div class="git-branch-row">
-            <span class="git-label main">main (통합)</span>
-            <div style="flex:1;position:relative;height:12px">
-              <div class="git-line main" style="position:absolute;top:5px;left:0;right:0"></div>
-              <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center">
-                <div class="gc main"></div><div class="gc-gap"></div>
-                <div class="gc main" style="margin-left:60%"></div><div class="gc-gap"></div>
-                <div class="gc main" style="position:absolute;right:0"></div>
-              </div>
-            </div>
-            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">← PR merge</span>
-          </div>
-          <div class="git-branch-row">
-            <span class="git-label agent1">agent/research</span>
-            <div style="flex:1;position:relative;height:12px">
-              <div class="git-line agent1" style="position:absolute;top:5px;left:5%;right:30%"></div>
-              <div style="position:absolute;top:0;left:5%;display:flex;align-items:center;gap:0">
-                <div class="gc agent1"></div>
-                <div style="width:60px"></div>
-                <div class="gc agent1"></div>
-                <div style="width:40px"></div>
-                <div class="gc agent1"></div>
-              </div>
-            </div>
-            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">조사 완료</span>
-          </div>
-          <div class="git-branch-row">
-            <span class="git-label agent2">agent/analysis</span>
-            <div style="flex:1;position:relative;height:12px">
-              <div class="git-line agent2" style="position:absolute;top:5px;left:5%;right:20%"></div>
-              <div style="position:absolute;top:0;left:5%;display:flex;align-items:center;gap:0">
-                <div class="gc agent2"></div>
-                <div style="width:80px"></div>
-                <div class="gc agent2"></div>
-                <div style="width:50px"></div>
-                <div class="gc agent2"></div>
-              </div>
-            </div>
-            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">분석 완료</span>
-          </div>
-          <div class="git-branch-row">
-            <span class="git-label agent3">agent/writer</span>
-            <div style="flex:1;position:relative;height:12px">
-              <div class="git-line agent3" style="position:absolute;top:5px;left:5%;right:5%"></div>
-              <div style="position:absolute;top:0;left:5%;display:flex;align-items:center;gap:0">
-                <div class="gc agent3"></div>
-                <div style="width:100px"></div>
-                <div class="gc agent3"></div>
-                <div style="width:80px"></div>
-                <div class="gc agent3"></div>
-              </div>
-            </div>
-            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">작성 중</span>
-          </div>
-        </div>
-        <div class="git-note">
-          각 에이전트가 독립 브랜치에서 동시에 커밋 → PR로 main에 통합. 에이전트 간 파일 충돌 없음.
+        <svg viewBox="0 0 540 162" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;overflow:visible;">
+          <!-- Labels -->
+          <text x="112" y="25" text-anchor="end" font-size="10" font-family="DM Mono,monospace" fill="#c96442" font-weight="500">main</text>
+          <text x="112" y="65" text-anchor="end" font-size="10" font-family="DM Mono,monospace" fill="#3b6fd4">agent/research</text>
+          <text x="112" y="102" text-anchor="end" font-size="10" font-family="DM Mono,monospace" fill="#2a7a52">agent/analysis</text>
+          <text x="112" y="139" text-anchor="end" font-size="10" font-family="DM Mono,monospace" fill="#6b46c1">agent/writer</text>
+
+          <!-- Main line -->
+          <line x1="120" y1="22" x2="510" y2="22" stroke="#c96442" stroke-width="2" stroke-opacity="0.35"/>
+
+          <!-- Diverge: main → each agent branch -->
+          <line x1="150" y1="22" x2="170" y2="62" stroke="#3b6fd4" stroke-width="1.5" stroke-opacity="0.7"/>
+          <line x1="150" y1="22" x2="170" y2="99" stroke="#2a7a52" stroke-width="1.5" stroke-opacity="0.7"/>
+          <line x1="150" y1="22" x2="170" y2="136" stroke="#6b46c1" stroke-width="1.5" stroke-opacity="0.7"/>
+
+          <!-- Agent branch lines -->
+          <line x1="170" y1="62"  x2="358" y2="62"  stroke="#3b6fd4" stroke-width="1.5" stroke-opacity="0.4"/>
+          <line x1="170" y1="99"  x2="398" y2="99"  stroke="#2a7a52" stroke-width="1.5" stroke-opacity="0.4"/>
+          <line x1="170" y1="136" x2="440" y2="136" stroke="#6b46c1" stroke-width="1.5" stroke-opacity="0.4" stroke-dasharray="5,3"/>
+
+          <!-- Merge: agent branch → main (PR) -->
+          <line x1="358" y1="62"  x2="376" y2="22" stroke="#3b6fd4" stroke-width="1.5" stroke-opacity="0.7"/>
+          <line x1="398" y1="99"  x2="416" y2="22" stroke="#2a7a52" stroke-width="1.5" stroke-opacity="0.7"/>
+
+          <!-- Main commits -->
+          <circle cx="120" cy="22" r="5" fill="#c96442" stroke="white" stroke-width="2"/>
+          <circle cx="150" cy="22" r="5" fill="#c96442" stroke="white" stroke-width="2"/>
+          <circle cx="378" cy="22" r="5" fill="#c96442" stroke="white" stroke-width="2"/>
+          <circle cx="418" cy="22" r="5" fill="#c96442" stroke="white" stroke-width="2"/>
+          <circle cx="510" cy="22" r="5" fill="#c96442" stroke="white" stroke-width="2"/>
+
+          <!-- Agent1 commits -->
+          <circle cx="170" cy="62" r="4" fill="#3b6fd4" stroke="white" stroke-width="2"/>
+          <circle cx="240" cy="62" r="4" fill="#3b6fd4" stroke="white" stroke-width="2"/>
+          <circle cx="310" cy="62" r="4" fill="#3b6fd4" stroke="white" stroke-width="2"/>
+          <circle cx="358" cy="62" r="4" fill="#3b6fd4" stroke="white" stroke-width="2"/>
+
+          <!-- Agent2 commits -->
+          <circle cx="170" cy="99" r="4" fill="#2a7a52" stroke="white" stroke-width="2"/>
+          <circle cx="255" cy="99" r="4" fill="#2a7a52" stroke="white" stroke-width="2"/>
+          <circle cx="335" cy="99" r="4" fill="#2a7a52" stroke="white" stroke-width="2"/>
+          <circle cx="398" cy="99" r="4" fill="#2a7a52" stroke="white" stroke-width="2"/>
+
+          <!-- Agent3 commits -->
+          <circle cx="170" cy="136" r="4" fill="#6b46c1" stroke="white" stroke-width="2"/>
+          <circle cx="270" cy="136" r="4" fill="#6b46c1" stroke="white" stroke-width="2"/>
+          <circle cx="380" cy="136" r="4" fill="#6b46c1" stroke="white" stroke-width="2"/>
+
+          <!-- PR labels -->
+          <text x="378" y="13" text-anchor="middle" font-size="9" font-family="DM Mono,monospace" fill="#c96442">PR1↑</text>
+          <text x="418" y="13" text-anchor="middle" font-size="9" font-family="DM Mono,monospace" fill="#c96442">PR2↑</text>
+
+          <!-- Status labels -->
+          <text x="362" y="56" font-size="9" font-family="DM Mono,monospace" fill="#3b6fd4">조사 완료</text>
+          <text x="402" y="93" font-size="9" font-family="DM Mono,monospace" fill="#2a7a52">분석 완료</text>
+          <text x="444" y="130" font-size="9" font-family="DM Mono,monospace" fill="#6b46c1">작업 중...</text>
+        </svg>
+        <div class="git-note" style="margin-top:12px;">
+          각 에이전트가 독립 브랜치에서 동시에 커밋 → PR로 main에 통합. agent/writer는 작업 진행 중 (점선). 에이전트 간 파일 충돌 없음.
         </div>
       </div>
     </div>
