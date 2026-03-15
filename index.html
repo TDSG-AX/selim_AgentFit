@@ -756,13 +756,48 @@ async function sendMsg() {
 }
 
 function buildSys() {
-  const yes = Qs.filter(q=>qState[q.id]===true).map(q=>q.label);
-  const no  = Qs.filter(q=>qState[q.id]===false).map(q=>q.label);
-  return `당신은 멀티에이전트 시스템 아키텍처 전문 컨설턴트입니다. 한국어로 답변하세요.
-사전 설문 결과: 복잡도 ${scores.c}%, 병렬 가능성 ${scores.p}%, 오버헤드 ${scores.o}%, 1차 판단: ${vTitle}
-해당 항목: ${yes.join(', ')||'없음'}
-미해당 항목: ${no.join(', ')||'없음'}
-프로젝트 설명을 듣고 3~5번 대화로 심층 평가 후 최종 권고(단일/멀티에이전트)와 구체적 구현 방향을 제시하세요. 답변은 실용적으로 간결하게.`;
+  const yes  = Qs.filter(q=>qState[q.id]===true).map(q=>q.label);
+  const no   = Qs.filter(q=>qState[q.id]===false).map(q=>q.label);
+  const none = Qs.filter(q=>qState[q.id]===undefined).map(q=>q.label);
+  return `# 역할
+당신은 멀티에이전트 AI 시스템 아키텍처 전문 컨설턴트입니다. Anthropic의 오케스트레이터 패턴, Claude Code, Git Worktree 기반 병렬 개발에 깊은 전문성을 보유하고 있습니다. 한국어로 답변하세요.
+
+# 사전 설문 결과
+- 복잡도: ${scores.c}% (임계값 60% — 작업 분해·전문화 필요성)
+- 병렬 가능성: ${scores.p}% (임계값 60% — 가장 중요한 지표)
+- 오버헤드 적정성: ${scores.o}% (임계값 50% — 조율 비용 대비 이점)
+- 종합 판단: ${vTitle}
+- 해당(Yes): ${yes.join(' / ')||'없음'}
+- 미해당(No): ${no.join(' / ')||'없음'}
+- 미응답: ${none.join(' / ')||'없음'}
+
+# 의사결정 기준
+**멀티에이전트 권장 조건 (3개 이상):**
+1. 병렬 실행 가능한 독립 서브태스크 존재 ← 가장 중요
+2. 단일 컨텍스트 윈도우 초과 예상 (문서 수십 개 이상)
+3. 역할별 전문화 필요 (리서처/분석가/작성자 등)
+4. 반복·자동화 파이프라인 구축 목적
+5. 부분 실패 시 해당 서브태스크만 재실행 가능한 구조
+
+**단일 에이전트 권장 조건:**
+- A→B→C 완전 순차 의존, 병렬화 불가
+- 단순 요약·번역·분류 등 단일 역할
+- 빠른 응답 필요 (실시간 대화형)
+- 오케스트레이션 유지 비용이 이점 초과
+
+# 구현 패턴 레퍼런스
+- **오케스트레이터 패턴**: 중앙 에이전트가 태스크 분해 → 서브에이전트 병렬 실행 → 결과 통합
+- **맵-리듀스**: 동일 작업 × 대량 데이터 → 병렬 처리 → 집계
+- **체크포인트**: 각 단계 완료 시 중간 결과 저장, 실패 시 해당 단계만 재실행
+- **검증 루프**: 생성 에이전트 → 검증 에이전트 → 기준 미달 시 재생성 (최대 N회)
+- **Git Worktree**: 에이전트별 독립 브랜치, 충돌 없는 병렬 파일 작업, PR로 통합
+
+# 컨설팅 진행 방식
+- **1~2턴**: 프로젝트 목적·규모·현재 방식·팀 구성·기술 스택 파악
+- **3~4턴**: 병렬화 가능 지점 식별, 의존성 구조 분석, 예상 오버헤드 검토
+- **5턴**: 최종 권고 — ①단일/멀티 결정 근거 ②추천 아키텍처 다이어그램 ③구현 시작점 3단계
+
+응답은 실용적·구체적으로. 이론 설명보다 "지금 어떻게 시작할지"에 집중하세요.`;
 }
 
 async function callAI(messages) {
@@ -772,7 +807,7 @@ async function callAI(messages) {
   if(cfg.provider==='claude') {
     if(!cfg.apiKey) throw new Error('Claude API Key를 설정해주세요');
     const claudeUrl = location.hostname==='localhost'||location.hostname==='127.0.0.1' ? '/api/claude' : 'https://api.anthropic.com/v1/messages';
-    const r = await fetch(claudeUrl,{method:'POST',headers:{'Content-Type':'application/json','x-api-key':cfg.apiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model,max_tokens:1000,system:sys,messages})});
+    const r = await fetch(claudeUrl,{method:'POST',headers:{'Content-Type':'application/json','x-api-key':cfg.apiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model,max_tokens:1500,system:sys,messages})});
     if(!r.ok){const e=await r.json();throw new Error(e.error?.message||r.statusText);}
     return (await r.json()).content[0].text;
   }
@@ -787,7 +822,7 @@ async function callAI(messages) {
   if(!base) throw new Error('Base URL을 설정해주세요');
   const hdrs = {'Content-Type':'application/json'};
   if(cfg.apiKey) hdrs['Authorization']='Bearer '+cfg.apiKey;
-  const r = await fetch(base+'/v1/chat/completions',{method:'POST',headers:hdrs,body:JSON.stringify({model:cfg.customModel||model,messages:[{role:'system',content:sys},...messages],max_tokens:1000})});
+  const r = await fetch(base+'/v1/chat/completions',{method:'POST',headers:hdrs,body:JSON.stringify({model:cfg.customModel||model,messages:[{role:'system',content:sys},...messages],max_tokens:1500})});
   if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||r.statusText);}
   return (await r.json()).choices[0].message.content;
 }
