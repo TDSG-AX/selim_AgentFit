@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentFit — 멀티에이전트 도입 평가 도구</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Noto+Sans+KR:wght@400;500;600&display=swap');
+
+:root {
+  --bg:        #f5f4f0;
+  --bg2:       #fffefb;
+  --bg3:       #eeedea;
+  --surface:   #ffffff;
+  --border:    rgba(0,0,0,0.08);
+  --border2:   rgba(0,0,0,0.13);
+  --text:      #1a1916;
+  --text2:     #6b6862;
+  --text3:     #a8a49e;
+  --accent:    #c96442;
+  --accent-bg: rgba(201,100,66,0.08);
+  --accent-lt: rgba(201,100,66,0.14);
+  --blue:      #3b6fd4;
+  --blue-bg:   rgba(59,111,212,0.08);
+  --green:     #2a7a52;
+  --green-bg:  rgba(42,122,82,0.08);
+  --amber:     #a06020;
+  --amber-bg:  rgba(160,96,32,0.08);
+  --purple:    #6b46c1;
+  --purple-bg: rgba(107,70,193,0.08);
+  --teal:      #1a7a6e;
+  --teal-bg:   rgba(26,122,110,0.08);
+  --r:  10px;
+  --rs: 6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans KR', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* ── PAGE ROUTER ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ═══════════════════════════════════════
+   HEADER / NAV
+═══════════════════════════════════════ */
+.site-header {
+  background: var(--surface);
+  border-bottom: 0.5px solid var(--border2);
+  position: sticky; top: 0; z-index: 100;
+}
+.header-inner {
+  max-width: 860px; margin: 0 auto;
+  padding: 0 20px;
+  display: flex; align-items: center; gap: 0;
+  height: 52px;
+}
+.logo-wrap { display: flex; align-items: center; gap: 9px; text-decoration: none; margin-right: 32px; }
+.logo-icon {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: #fff; letter-spacing: -.5px;
+}
+.logo-name { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -.3px; }
+.logo-ver  { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text3); margin-left: 4px; }
+.nav { display: flex; align-items: center; gap: 2px; flex: 1; }
+.nav-btn {
+  padding: 5px 12px; border-radius: var(--rs); font-size: 13px; font-weight: 500;
+  color: var(--text2); cursor: pointer; border: none; background: transparent;
+  transition: all .13s; font-family: inherit;
+}
+.nav-btn:hover { color: var(--text); background: var(--bg3); }
+.nav-btn.active { color: var(--text); background: var(--bg3); }
+.nav-sep { width: 0.5px; height: 18px; background: var(--border2); margin: 0 6px; }
+.nav-doc {
+  margin-left: auto;
+  padding: 5px 12px; border-radius: var(--rs); font-size: 12px; font-weight: 500;
+  color: var(--accent); cursor: pointer; border: 0.5px solid rgba(201,100,66,0.3);
+  background: var(--accent-bg); transition: all .13s; font-family: inherit;
+}
+.nav-doc:hover { background: var(--accent-lt); }
+.nav-doc.active { background: var(--accent-lt); border-color: rgba(201,100,66,0.5); }
+
+/* ── FOOTER ── */
+.site-footer {
+  border-top: 0.5px solid var(--border);
+  padding: 18px 20px;
+  max-width: 860px; margin: 40px auto 0;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px;
+}
+.footer-left { font-size: 11px; color: var(--text3); display: flex; align-items: center; gap: 10px; }
+.footer-links { display: flex; gap: 12px; }
+.footer-link { font-size: 11px; color: var(--text3); cursor: pointer; text-decoration: none; }
+.footer-link:hover { color: var(--accent); }
+
+/* ═══════════════════════════════════════
+   MAIN APP LAYOUT
+═══════════════════════════════════════ */
+.app-wrap { max-width: 860px; margin: 0 auto; padding: 28px 20px 0; }
+
+/* Tabs */
+.tabs-row {
+  display: flex; gap: 2px;
+  background: var(--surface); border: 0.5px solid var(--border2);
+  border-radius: var(--r); padding: 4px; margin-bottom: 24px;
+}
+.app-tab {
+  flex: 1; padding: 8px 10px; border-radius: var(--rs);
+  font-size: 12px; font-weight: 500; color: var(--text2);
+  cursor: pointer; text-align: center; border: none; background: transparent;
+  transition: all .13s; font-family: inherit;
+}
+.app-tab:hover { color: var(--text); }
+.app-tab.active { background: var(--bg3); color: var(--text); border: 0.5px solid var(--border2); }
+.tab-n {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--bg3); font-size: 9px; margin-right: 5px;
+  color: var(--text2);
+}
+.app-tab.active .tab-n { background: var(--accent); color: #fff; }
+
+/* Panel */
+.app-panel { display: none; }
+.app-panel.active { display: block; }
+
+/* ── SECTION LABEL ── */
+.sec { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 10px; }
+
+/* ═══════════════════════════════════════
+   PANEL 1 — SURVEY
+═══════════════════════════════════════ */
+.q-stack { display: flex; flex-direction: column; gap: 5px; }
+.q-card {
+  background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r);
+  padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+  transition: border-color .13s;
+}
+.q-card:hover { border-color: var(--border2); }
+.q-card.y { border-color: rgba(42,122,82,0.4); background: rgba(42,122,82,0.03); }
+.q-pip { width: 6px; height: 6px; border-radius: 50%; background: var(--bg3); flex-shrink: 0; transition: background .13s; }
+.q-card.y .q-pip { background: var(--green); }
+.q-body { flex: 1; min-width: 0; }
+.q-top  { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.q-chip {
+  font-family: 'DM Mono', monospace; font-size: 9px; padding: 1px 6px;
+  border-radius: 3px; border: 0.5px solid var(--border2); color: var(--text3);
+  background: var(--bg3); flex-shrink: 0;
+}
+.q-label { font-size: 13px; font-weight: 500; }
+.q-hint  { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.q-tog   { display: flex; gap: 4px; flex-shrink: 0; }
+.tog {
+  font-size: 11px; padding: 4px 11px; border-radius: 20px;
+  border: 0.5px solid var(--border2); background: transparent;
+  color: var(--text2); cursor: pointer; transition: all .12s; font-family: inherit;
+}
+.tog:hover { background: var(--bg3); }
+.tog.y { background: var(--green-bg); color: var(--green); border-color: rgba(42,122,82,0.35); }
+.tog.n { background: var(--bg3); color: var(--text2); }
+
+/* Score bars */
+.score-block { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r); padding: 14px 16px; margin: 16px 0; }
+.sbar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.sbar-row:last-child { margin-bottom: 0; }
+.sbar-name { font-size: 11px; color: var(--text2); width: 72px; flex-shrink: 0; }
+.sbar-track { flex: 1; height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.sbar-fill { height: 100%; border-radius: 3px; width: 0%; transition: width .5s cubic-bezier(.4,0,.2,1); }
+.sbar-fill.fc { background: var(--blue); }
+.sbar-fill.fp { background: var(--green); }
+.sbar-fill.fo { background: var(--amber); }
+.sbar-pct { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); width: 32px; text-align: right; }
+
+/* Verdict */
+.verdict {
+  border-radius: var(--r); padding: 14px 16px; border: 0.5px solid var(--border);
+  background: var(--surface);
+}
+.verdict.vn  { background: var(--bg3); border-color: var(--border); }
+.verdict.vs  { background: var(--green-bg); border-color: rgba(42,122,82,0.25); }
+.verdict.vm  { background: var(--amber-bg); border-color: rgba(160,96,32,0.25); }
+.verdict.vx  { background: var(--blue-bg);  border-color: rgba(59,111,212,0.25); }
+.v-head { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+.v-dot  { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); flex-shrink: 0; }
+.verdict.vs .v-dot { background: var(--green); }
+.verdict.vm .v-dot { background: var(--amber); }
+.verdict.vx .v-dot { background: var(--blue); }
+.v-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.verdict.vs .v-title { color: var(--green); }
+.verdict.vm .v-title { color: var(--amber); }
+.verdict.vx .v-title { color: var(--blue); }
+.v-desc { font-size: 12px; color: var(--text2); }
+
+.go-btn {
+  width: 100%; margin-top: 12px; padding: 11px; border-radius: var(--r);
+  border: 0.5px solid rgba(59,111,212,0.35); background: var(--blue-bg);
+  color: var(--blue); font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all .13s; font-family: inherit; display: none;
+}
+.go-btn:hover { background: rgba(59,111,212,0.14); }
+.go-btn.show { display: block; }
+
+/* ═══════════════════════════════════════
+   PANEL 2 — CONSULTING
+═══════════════════════════════════════ */
+.summary-bar {
+  background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r);
+  padding: 12px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+}
+.sum-item { display: flex; align-items: center; gap: 6px; }
+.sum-lbl  { font-size: 11px; color: var(--text3); }
+.sum-val  { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; color: var(--text); }
+.sum-badge { font-size: 10px; padding: 2px 9px; border-radius: 20px; font-weight: 500; }
+.sb-none   { background: var(--bg3);       color: var(--text3); }
+.sb-single { background: var(--green-bg);  color: var(--green); }
+.sb-maybe  { background: var(--amber-bg);  color: var(--amber); }
+.sb-multi  { background: var(--blue-bg);   color: var(--blue);  }
+
+.api-warn {
+  background: var(--amber-bg); border: 0.5px solid rgba(160,96,32,0.3);
+  border-radius: var(--rs); padding: 10px 14px; font-size: 12px; color: var(--amber);
+  margin-bottom: 14px; display: none; align-items: center; gap: 6px;
+}
+.api-warn.show { display: flex; }
+.api-warn a { color: var(--amber); text-decoration: underline; cursor: pointer; }
+
+.chat-box {
+  background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r);
+  min-height: 320px; max-height: 440px; overflow-y: auto;
+  padding: 14px; display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 10px; scroll-behavior: smooth;
+}
+.chat-empty-wrap {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex: 1; min-height: 260px; gap: 8px; text-align: center;
+}
+.chat-empty-wrap p { font-size: 12px; color: var(--text3); line-height: 1.6; }
+
+.msg { display: flex; gap: 8px; }
+.msg.u { flex-direction: row-reverse; }
+.av {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 600; margin-top: 2px;
+}
+.msg.a .av { background: var(--accent-bg); color: var(--accent); border: 0.5px solid rgba(201,100,66,0.25); }
+.msg.u .av { background: var(--bg3); color: var(--text2); border: 0.5px solid var(--border2); }
+.bub {
+  padding: 9px 13px; border-radius: var(--r); font-size: 13px; line-height: 1.6;
+  max-width: calc(100% - 44px);
+}
+.msg.a .bub { background: var(--bg); border: 0.5px solid var(--border); border-bottom-left-radius: 3px; }
+.msg.u .bub { background: var(--blue-bg); border: 0.5px solid rgba(59,111,212,0.2); border-bottom-right-radius: 3px; }
+.bub.typing { color: var(--text3); font-style: italic; }
+
+.chat-row { display: flex; gap: 8px; }
+.chat-ta {
+  flex: 1; background: var(--surface); border: 0.5px solid var(--border2);
+  border-radius: var(--r); padding: 9px 13px; color: var(--text);
+  font-size: 13px; font-family: inherit; resize: none; line-height: 1.5; outline: none;
+  transition: border-color .13s;
+}
+.chat-ta:focus { border-color: rgba(59,111,212,0.4); }
+.chat-ta::placeholder { color: var(--text3); }
+.send-btn {
+  padding: 9px 16px; border-radius: var(--r); background: var(--blue);
+  border: none; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer;
+  font-family: inherit; transition: opacity .13s; flex-shrink: 0;
+}
+.send-btn:hover { opacity: .85; }
+.send-btn:disabled { opacity: .4; cursor: not-allowed; }
+.chat-hint { font-size: 11px; color: var(--text3); text-align: center; margin-top: 7px; }
+
+/* ═══════════════════════════════════════
+   PANEL 3 — SETTINGS
+═══════════════════════════════════════ */
+.prov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 7px; margin-bottom: 18px; }
+.prov-card {
+  background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r);
+  padding: 12px 10px; cursor: pointer; text-align: center; transition: all .13s;
+}
+.prov-card:hover { border-color: var(--border2); background: var(--bg); }
+.prov-card.sel { border-color: rgba(201,100,66,0.45); background: var(--accent-bg); }
+.prov-icon { font-size: 18px; margin-bottom: 5px; }
+.prov-name { font-size: 12px; font-weight: 500; }
+.prov-type { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+.field-row { margin-bottom: 11px; }
+.field-lbl { font-size: 11px; color: var(--text2); margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+.fbadge { font-size: 9px; background: var(--bg3); border: 0.5px solid var(--border); padding: 1px 5px; border-radius: 3px; color: var(--text3); }
+.field-in {
+  width: 100%; background: var(--surface); border: 0.5px solid var(--border2);
+  border-radius: var(--rs); padding: 8px 11px; color: var(--text);
+  font-size: 12px; font-family: 'DM Mono', monospace; outline: none; transition: border-color .13s;
+}
+.field-in:focus { border-color: rgba(201,100,66,0.4); }
+.field-in::placeholder { color: var(--text3); }
+.field-sel {
+  width: 100%; background: var(--surface); border: 0.5px solid var(--border2);
+  border-radius: var(--rs); padding: 8px 11px; color: var(--text);
+  font-size: 12px; font-family: inherit; outline: none; cursor: pointer;
+}
+.save-btn {
+  padding: 8px 18px; border-radius: var(--rs); background: var(--accent);
+  border: none; color: #fff; font-size: 12px; font-weight: 500; cursor: pointer;
+  font-family: inherit; transition: opacity .13s;
+}
+.save-btn:hover { opacity: .85; }
+.saved-ok { font-size: 11px; color: var(--green); margin-left: 10px; opacity: 0; transition: opacity .3s; }
+.saved-ok.show { opacity: 1; }
+.tip-card {
+  background: var(--surface); border: 0.5px solid var(--border);
+  border-left: 2px solid var(--accent); border-radius: var(--rs);
+  padding: 10px 14px; font-size: 11px; color: var(--text2); line-height: 1.6; margin-top: 16px;
+}
+
+
+/* ═══════════════════════════════════════
+   DOC PAGE
+═══════════════════════════════════════ */
+.doc-wrap { max-width: 860px; margin: 0 auto; padding: 36px 20px 0; }
+.doc-hero { margin-bottom: 40px; }
+.doc-eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+.doc-title { font-size: 26px; font-weight: 600; letter-spacing: -.5px; line-height: 1.3; color: var(--text); margin-bottom: 10px; }
+.doc-lead { font-size: 14px; color: var(--text2); line-height: 1.7; max-width: 560px; }
+
+.doc-section { margin-bottom: 48px; }
+.doc-section-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.doc-section-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
+.ds-num { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* Infographic cards */
+.info-row { display: grid; gap: 10px; }
+.info-row.cols2 { grid-template-columns: 1fr 1fr; }
+.info-row.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+.info-card {
+  background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r); padding: 16px 18px;
+}
+.info-card-icon { font-size: 22px; margin-bottom: 8px; }
+.info-card-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.info-card-body  { font-size: 12px; color: var(--text2); line-height: 1.65; }
+.info-card.accent { border-color: rgba(201,100,66,0.3); background: var(--accent-bg); }
+.info-card.blue   { border-color: rgba(59,111,212,0.3); background: var(--blue-bg); }
+.info-card.green  { border-color: rgba(42,122,82,0.3);  background: var(--green-bg); }
+.info-card.amber  { border-color: rgba(160,96,32,0.3);  background: var(--amber-bg); }
+.info-card.purple { border-color: rgba(107,70,193,0.3); background: var(--purple-bg); }
+.info-card.teal   { border-color: rgba(26,122,110,0.3); background: var(--teal-bg); }
+
+/* Flow diagram */
+.flow-diagram { display: flex; align-items: flex-start; gap: 0; overflow-x: auto; padding-bottom: 6px; }
+.flow-node {
+  display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+}
+.flow-box {
+  background: var(--surface); border: 0.5px solid var(--border2); border-radius: var(--r);
+  padding: 10px 14px; text-align: center; min-width: 100px;
+}
+.flow-box.root  { border-color: rgba(201,100,66,0.4); background: var(--accent-bg); }
+.flow-box.sub   { border-color: rgba(59,111,212,0.3); background: var(--blue-bg); }
+.flow-box.tool  { border-color: rgba(42,122,82,0.3);  background: var(--green-bg); }
+.flow-box-icon  { font-size: 16px; margin-bottom: 4px; }
+.flow-box-name  { font-size: 11px; font-weight: 600; color: var(--text); }
+.flow-box-role  { font-size: 10px; color: var(--text3); margin-top: 1px; }
+.flow-arr {
+  display: flex; align-items: center; padding: 0 6px; color: var(--text3); font-size: 14px;
+  margin-top: 28px;
+}
+.flow-children { display: flex; flex-direction: column; gap: 6px; margin-top: 0; }
+.flow-child-row { display: flex; align-items: center; }
+
+/* Parallel flow */
+.parallel-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r); padding: 20px; }
+.parallel-row { display: flex; align-items: center; gap: 0; }
+.parallel-split { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.parallel-line { display: flex; align-items: center; gap: 6px; }
+.p-box {
+  background: var(--bg); border: 0.5px solid var(--border2); border-radius: var(--rs);
+  padding: 7px 12px; font-size: 11px; font-weight: 500; white-space: nowrap;
+}
+.p-box.orch { border-color: rgba(201,100,66,0.4); background: var(--accent-bg); color: var(--accent); }
+.p-box.sub1 { border-color: rgba(59,111,212,0.3);  background: var(--blue-bg);   color: var(--blue); }
+.p-box.sub2 { border-color: rgba(42,122,82,0.3);   background: var(--green-bg);  color: var(--green); }
+.p-box.sub3 { border-color: rgba(107,70,193,0.3);  background: var(--purple-bg); color: var(--purple); }
+.p-box.merge{ border-color: rgba(160,96,32,0.3);   background: var(--amber-bg);  color: var(--amber); }
+.p-arrow { font-size: 13px; color: var(--text3); padding: 0 5px; }
+.p-center { display: flex; align-items: center; justify-content: center; padding: 0 14px; }
+.p-label  { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; writing-mode: vertical-rl; letter-spacing: 1px; }
+
+/* Git worktree diagram */
+.git-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r); padding: 20px; font-family: 'DM Mono', monospace; }
+.git-timeline { position: relative; }
+.git-branch-row { display: flex; align-items: center; gap: 0; margin-bottom: 14px; position: relative; }
+.git-branch-row:last-child { margin-bottom: 0; }
+.git-label { font-size: 10px; width: 110px; flex-shrink: 0; }
+.git-label.main   { color: var(--accent); }
+.git-label.agent1 { color: var(--blue); }
+.git-label.agent2 { color: var(--green); }
+.git-label.agent3 { color: var(--purple); }
+.git-line { flex: 1; height: 2px; position: relative; border-radius: 1px; }
+.git-line.main   { background: rgba(201,100,66,0.3); }
+.git-line.agent1 { background: rgba(59,111,212,0.3); }
+.git-line.agent2 { background: rgba(42,122,82,0.3); }
+.git-line.agent3 { background: rgba(107,70,193,0.3); }
+.git-commits { display: flex; align-items: center; gap: 0; position: absolute; top: -5px; left: 0; right: 0; }
+.gc {
+  width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff;
+  flex-shrink: 0; cursor: default;
+}
+.gc.main   { background: var(--accent); }
+.gc.agent1 { background: var(--blue); }
+.gc.agent2 { background: var(--green); }
+.gc.agent3 { background: var(--purple); }
+.gc-gap { flex: 1; }
+.git-note { font-size: 10px; color: var(--text3); margin-top: 12px; line-height: 1.6; }
+
+/* Comparison table */
+.cmp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.cmp-table th {
+  background: var(--bg3); font-weight: 600; padding: 9px 12px;
+  text-align: left; font-size: 11px; color: var(--text2); border-bottom: 0.5px solid var(--border2);
+}
+.cmp-table td { padding: 9px 12px; border-bottom: 0.5px solid var(--border); vertical-align: top; color: var(--text); }
+.cmp-table tr:last-child td { border-bottom: none; }
+.cmp-table tr:hover td { background: var(--bg); }
+.cmp-good  { color: var(--green); font-weight: 500; }
+.cmp-bad   { color: var(--accent); }
+.cmp-neu   { color: var(--text2); }
+
+/* Step list */
+.step-list { display: flex; flex-direction: column; gap: 10px; }
+.step-item { display: flex; gap: 12px; }
+.step-num {
+  width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff;
+  font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.step-body .step-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.step-body .step-desc  { font-size: 12px; color: var(--text2); }
+
+/* Code block */
+.code-block {
+  background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--rs);
+  padding: 12px 14px; font-family: 'DM Mono', monospace; font-size: 11px;
+  color: var(--text); line-height: 1.7; overflow-x: auto; white-space: pre;
+}
+
+/* Divider */
+.doc-divider { border: none; border-top: 0.5px solid var(--border); margin: 32px 0; }
+
+/* Chip row */
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip {
+  font-size: 11px; padding: 3px 10px; border-radius: 20px;
+  border: 0.5px solid var(--border2); color: var(--text2); background: var(--surface);
+}
+.chip.c-accent { border-color: rgba(201,100,66,0.35); color: var(--accent); background: var(--accent-bg); }
+.chip.c-blue   { border-color: rgba(59,111,212,0.35);  color: var(--blue);   background: var(--blue-bg); }
+.chip.c-green  { border-color: rgba(42,122,82,0.35);   color: var(--green);  background: var(--green-bg); }
+
+hr.light { border: none; border-top: 0.5px solid var(--border); margin: 18px 0; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+@media(max-width:600px) {
+  .info-row.cols2, .info-row.cols3 { grid-template-columns: 1fr; }
+  .parallel-row { flex-direction: column; gap: 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     HEADER
+════════════════════════════════════ -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo-wrap" onclick="showPage('app')">
+      <div class="logo-icon">MA</div>
+      <span class="logo-name">AgentFit</span>
+      <span class="logo-ver">v0.1</span>
+    </a>
+    <nav class="nav">
+      <button class="nav-btn active" id="nav-app" onclick="showPage('app')">평가 도구</button>
+      <div class="nav-sep"></div>
+      <button class="nav-doc" id="nav-doc" onclick="showPage('doc')">Docs ↗</button>
+    </nav>
+  </div>
+</header>
+
+
+<!-- ════════════════════════════════════
+     PAGE: APP
+════════════════════════════════════ -->
+<div class="page active" id="page-app">
+<div class="app-wrap">
+
+  <div class="tabs-row">
+    <button class="app-tab active" onclick="switchTab('survey')"><span class="tab-n">1</span>기본 설문</button>
+    <button class="app-tab" onclick="switchTab('consult')" id="tab-consult"><span class="tab-n">2</span>AI 컨설팅</button>
+    <button class="app-tab" onclick="switchTab('settings')"><span class="tab-n">3</span>API 설정</button>
+  </div>
+
+  <!-- ── TAB 1: SURVEY ── -->
+  <div class="app-panel active" id="panel-survey">
+    <div class="sec">복잡도 평가 기준 — 9개 항목</div>
+    <div class="q-stack" id="q-list"></div>
+
+    <div class="score-block" style="margin-top:16px">
+      <div class="sec" style="margin-bottom:12px">점수 현황</div>
+      <div class="sbar-row"><span class="sbar-name">복잡도</span><div class="sbar-track"><div class="sbar-fill fc" id="bc"></div></div><span class="sbar-pct" id="pc">0%</span></div>
+      <div class="sbar-row"><span class="sbar-name">병렬 가능성</span><div class="sbar-track"><div class="sbar-fill fp" id="bp"></div></div><span class="sbar-pct" id="pp">0%</span></div>
+      <div class="sbar-row"><span class="sbar-name">오버헤드</span><div class="sbar-track"><div class="sbar-fill fo" id="bo"></div></div><span class="sbar-pct" id="po">0%</span></div>
+    </div>
+
+    <div class="verdict vn" id="verdict">
+      <div class="v-head"><div class="v-dot"></div><div class="v-title">설문을 완료하면 결과가 표시됩니다</div></div>
+    </div>
+    <button class="go-btn" id="go-btn" onclick="switchTab('consult')">AI 심층 컨설팅으로 이동 →</button>
+  </div>
+
+  <!-- ── TAB 2: CONSULTING ── -->
+  <div class="app-panel" id="panel-consult">
+    <div class="summary-bar" id="summary-bar">
+      <div class="sum-item"><span class="sum-lbl">복잡도</span><span class="sum-val" id="s-c">—</span></div>
+      <div class="sum-item"><span class="sum-lbl">병렬 가능성</span><span class="sum-val" id="s-p">—</span></div>
+      <div class="sum-item"><span class="sum-lbl">오버헤드</span><span class="sum-val" id="s-o">—</span></div>
+      <div class="sum-item"><span class="sum-lbl">1차 판단</span><span class="sum-badge sb-none" id="s-v">미완료</span></div>
+    </div>
+    <div class="api-warn" id="api-warn">⚠ API 미설정 — <a onclick="switchTab('settings')">API 설정 탭</a>에서 먼저 설정해주세요.</div>
+
+    <div class="sec">심층 대화 컨설팅</div>
+    <div class="chat-box" id="chat-box">
+      <div class="chat-empty-wrap" id="chat-empty">
+        <p>프로젝트나 개발 계획을 자유롭게 설명해주세요.<br>설문 결과를 바탕으로 심층 분석을 도와드립니다.</p>
+      </div>
+    </div>
+    <div class="chat-row">
+      <textarea class="chat-ta" id="chat-in" rows="2" placeholder="프로젝트를 설명해주세요... (Enter 전송 / Shift+Enter 줄바꿈)"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMsg()">전송</button>
+    </div>
+    <div class="chat-hint">설문을 먼저 완료하면 더 정확한 컨설팅이 가능합니다</div>
+  </div>
+
+  <!-- ── TAB 3: SETTINGS ── -->
+  <div class="app-panel" id="panel-settings">
+    <div class="sec">AI 제공자 선택</div>
+    <div class="prov-grid" id="prov-grid"></div>
+    <div id="api-fields"></div>
+    <div style="display:flex;align-items:center;margin-top:4px">
+      <button class="save-btn" onclick="saveSettings()">설정 저장</button>
+      <span class="saved-ok" id="saved-ok">저장되었습니다</span>
+    </div>
+    <div class="tip-card">
+      <strong>Ollama / LM Studio</strong>는 로컬 파일로 열 때만 동작합니다. 웹 배포(GitHub Pages 등) 환경에서는 CORS 정책으로 localhost 호출이 차단됩니다.<br><br>
+      <strong>API Key</strong>는 브라우저 localStorage에만 저장되며 외부로 전송되지 않습니다.
+    </div>
+  </div>
+
+</div><!-- .app-wrap -->
+</div><!-- #page-app -->
+
+
+<!-- ════════════════════════════════════
+     PAGE: DOC
+════════════════════════════════════ -->
+<div class="page" id="page-doc">
+<div class="doc-wrap">
+
+  <div class="doc-hero">
+    <div class="doc-eyebrow">AgentFit · Documentation</div>
+    <h1 class="doc-title">서브에이전트 &amp; 멀티에이전트<br>일하는 방식 가이드</h1>
+    <p class="doc-lead">AI 에이전트가 팀을 이루어 협업하는 구조, 작업 분배 방법론, Git Worktree를 활용한 병렬 개발 전략을 시각적으로 정리합니다.</p>
+  </div>
+
+  <!-- ── SECTION 1: 개념 ── -->
+  <div class="doc-section">
+    <div class="doc-section-title"><div class="ds-num">1</div>핵심 개념</div>
+    <div class="doc-section-sub">오케스트레이터, 서브에이전트, 서브태스크의 관계</div>
+
+    <div class="info-row cols3" style="margin-bottom:10px">
+      <div class="info-card accent">
+        <div class="info-card-icon">🧠</div>
+        <div class="info-card-title">오케스트레이터</div>
+        <div class="info-card-body">전체 목표를 이해하고 작업을 분해해 서브에이전트에게 위임. 결과를 수집·통합해 최종 산출물을 만드는 지휘자.</div>
+      </div>
+      <div class="info-card blue">
+        <div class="info-card-icon">⚙️</div>
+        <div class="info-card-title">서브에이전트</div>
+        <div class="info-card-body">특정 역할(리서처, 분석가, 코더 등)로 특화된 독립 Claude 인스턴스. 자신에게 할당된 서브태스크만 알고 수행.</div>
+      </div>
+      <div class="info-card green">
+        <div class="info-card-icon">📋</div>
+        <div class="info-card-title">서브태스크</div>
+        <div class="info-card-body">오케스트레이터가 분해한 작업 단위. 각 서브태스크는 명확한 입력·출력이 있으며 서브에이전트 1개가 담당.</div>
+      </div>
+    </div>
+
+    <div class="info-card" style="margin-top:0">
+      <div class="info-card-title" style="margin-bottom:10px">오케스트레이터 → 서브에이전트 흐름</div>
+      <div class="parallel-wrap" style="background:var(--bg);border:none;padding:16px 0 0">
+        <div class="parallel-row">
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <div class="p-box orch">🧠 오케스트레이터</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:5px;font-family:'DM Mono',monospace">태스크 분해 · 결과 통합</div>
+          </div>
+          <div class="p-center">
+            <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+              <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:2px">서브태스크 위임</div>
+              <div style="width:60px;height:0.5px;background:var(--border2)"></div>
+              <div style="font-size:16px;color:var(--text3)">→</div>
+            </div>
+          </div>
+          <div class="parallel-split">
+            <div class="parallel-line"><div class="p-box sub1">🔍 리서처</div><span style="font-size:10px;color:var(--text3);margin-left:8px">정보 수집 · 팩트 조사</span></div>
+            <div class="parallel-line"><div class="p-box sub2">📊 분석가</div><span style="font-size:10px;color:var(--text3);margin-left:8px">데이터 분석 · 인사이트</span></div>
+            <div class="parallel-line"><div class="p-box sub3">✍️ 작성자</div><span style="font-size:10px;color:var(--text3);margin-left:8px">문서화 · 보고서 작성</span></div>
+          </div>
+          <div class="p-center">
+            <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+              <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:2px">결과 반환</div>
+              <div style="width:60px;height:0.5px;background:var(--border2)"></div>
+              <div style="font-size:16px;color:var(--text3)">→</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <div class="p-box merge">📄 최종 산출물</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:5px;font-family:'DM Mono',monospace">통합 보고서</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="doc-divider">
+
+  <!-- ── SECTION 2: 컨텍스트 전달 ── -->
+  <div class="doc-section">
+    <div class="doc-section-title"><div class="ds-num">2</div>컨텍스트 전달 방식</div>
+    <div class="doc-section-sub">에이전트 간 메모리 없음 — 매 호출마다 결과를 명시적으로 전달해야 함</div>
+
+    <div class="info-row cols2" style="margin-bottom:12px">
+      <div class="info-card amber">
+        <div class="info-card-title">⚠ 핵심 제약</div>
+        <div class="info-card-body">Claude는 API 호출 간 메모리가 없습니다. 에이전트끼리 "직접 대화"하는 게 아니라, 항상 <strong>코드(또는 n8n)</strong>가 이전 결과를 다음 호출의 메시지에 포함시켜 전달합니다.</div>
+      </div>
+      <div class="info-card blue">
+        <div class="info-card-title">✓ 해결 패턴</div>
+        <div class="info-card-body">각 서브에이전트 호출 시 system prompt에 역할을, user message에 "이전 에이전트 결과 + 새 지시"를 함께 담아 전달. 히스토리 배열로 대화 맥락을 누적 관리.</div>
+      </div>
+    </div>
+
+    <div class="code-block">// 컨텍스트 체이닝 패턴
+const research = await callAgent("리서처", task);
+
+const analysis = await callAgent("분석가",
+  `원래 태스크: ${task}
+   리서처 결과: ${research}   ← 이전 결과를 명시적으로 포함
+   위 내용을 분석하세요.`
+);
+
+const report = await callAgent("오케스트레이터",
+  `태스크: ${task}
+   리서처: ${research}
+   분석가: ${analysis}
+   최종 보고서를 작성하세요.`
+);</div>
+  </div>
+
+  <hr class="doc-divider">
+
+  <!-- ── SECTION 3: 병렬 실행 ── -->
+  <div class="doc-section">
+    <div class="doc-section-title"><div class="ds-num">3</div>순차 vs 병렬 실행 패턴</div>
+    <div class="doc-section-sub">서브태스크 간 의존성이 없으면 Promise.all로 동시에 실행해 시간을 단축</div>
+
+    <div class="info-row cols2" style="margin-bottom:12px">
+      <div class="info-card">
+        <div class="info-card-title">순차 실행 (Sequential)</div>
+        <div class="info-card-body" style="margin-top:6px">A → B → C 순서로 하나씩 실행. 앞 단계 결과가 다음 단계의 입력이 되는 경우 사용.</div>
+        <div class="code-block" style="margin-top:10px;font-size:10px">const r1 = await agent1(task);
+const r2 = await agent2(r1);
+const r3 = await agent3(r2);</div>
+      </div>
+      <div class="info-card green">
+        <div class="info-card-title">병렬 실행 (Parallel)</div>
+        <div class="info-card-body" style="margin-top:6px">독립적인 서브태스크를 동시에 실행. 전체 시간 = 가장 오래 걸리는 에이전트 시간.</div>
+        <div class="code-block" style="margin-top:10px;font-size:10px">const [r1, r2, r3] = await Promise.all([
+  agent1(task),
+  agent2(task),
+  agent3(task)
+]);</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="doc-divider">
+
+  <!-- ── SECTION 4: Git Worktree ── -->
+  <div class="doc-section">
+    <div class="doc-section-title"><div class="ds-num">4</div>Git Worktree × 멀티에이전트 개발</div>
+    <div class="doc-section-sub">각 AI 에이전트가 독립 브랜치에서 병렬로 작업 — 충돌 없이 동시 개발</div>
+
+    <div class="info-row cols2" style="margin-bottom:14px">
+      <div class="info-card">
+        <div class="info-card-title">Git Worktree란?</div>
+        <div class="info-card-body">하나의 Git 저장소에서 여러 브랜치를 <strong>동시에 다른 폴더</strong>에 체크아웃하는 기능. 브랜치 전환 없이 각 브랜치가 독립된 작업 디렉토리를 가짐.</div>
+        <div class="code-block" style="margin-top:10px;font-size:10px"># 에이전트별 worktree 생성
+git worktree add ../agent-research feature/research
+git worktree add ../agent-analysis feature/analysis
+git worktree add ../agent-writer   feature/writer</div>
+      </div>
+      <div class="info-card blue">
+        <div class="info-card-title">멀티에이전트와 결합하면?</div>
+        <div class="info-card-body">각 AI 에이전트(Claude Code 인스턴스)를 별도 worktree 폴더에서 실행하면, 서로 다른 파일을 동시에 수정해도 <strong>충돌이 발생하지 않음</strong>.</div>
+        <div class="chip-row">
+          <span class="chip c-green">충돌 없는 병렬 작업</span>
+          <span class="chip c-blue">독립 컨텍스트</span>
+          <span class="chip c-accent">PR로 통합</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card" style="margin-bottom:0">
+      <div class="info-card-title" style="margin-bottom:14px">Git Worktree × 에이전트 팀 타임라인</div>
+      <div class="git-wrap">
+        <div class="git-timeline">
+          <div class="git-branch-row">
+            <span class="git-label main">main (통합)</span>
+            <div style="flex:1;position:relative;height:12px">
+              <div class="git-line main" style="position:absolute;top:5px;left:0;right:0"></div>
+              <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center">
+                <div class="gc main"></div><div class="gc-gap"></div>
+                <div class="gc main" style="margin-left:60%"></div><div class="gc-gap"></div>
+                <div class="gc main" style="position:absolute;right:0"></div>
+              </div>
+            </div>
+            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">← PR merge</span>
+          </div>
+          <div class="git-branch-row">
+            <span class="git-label agent1">agent/research</span>
+            <div style="flex:1;position:relative;height:12px">
+              <div class="git-line agent1" style="position:absolute;top:5px;left:5%;right:30%"></div>
+              <div style="position:absolute;top:0;left:5%;display:flex;align-items:center;gap:0">
+                <div class="gc agent1"></div>
+                <div style="width:60px"></div>
+                <div class="gc agent1"></div>
+                <div style="width:40px"></div>
+                <div class="gc agent1"></div>
+              </div>
+            </div>
+            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">조사 완료</span>
+          </div>
+          <div class="git-branch-row">
+            <span class="git-label agent2">agent/analysis</span>
+            <div style="flex:1;position:relative;height:12px">
+              <div class="git-line agent2" style="position:absolute;top:5px;left:5%;right:20%"></div>
+              <div style="position:absolute;top:0;left:5%;display:flex;align-items:center;gap:0">
+                <div class="gc agent2"></div>
+                <div style="width:80px"></div>
+                <div class="gc agent2"></div>
+                <div style="width:50px"></div>
+                <div class="gc agent2"></div>
+              </div>
+            </div>
+            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">분석 완료</span>
+          </div>
+          <div class="git-branch-row">
+            <span class="git-label agent3">agent/writer</span>
+            <div style="flex:1;position:relative;height:12px">
+              <div class="git-line agent3" style="position:absolute;top:5px;left:5%;right:5%"></div>
+              <div style="position:absolute;top:0;left:5%;display:flex;align-items:center;gap:0">
+                <div class="gc agent3"></div>
+                <div style="width:100px"></div>
+                <div class="gc agent3"></div>
+                <div style="width:80px"></div>
+                <div class="gc agent3"></div>
+              </div>
+            </div>
+            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">작성 중</span>
+          </div>
+        </div>
+        <div class="git-note">
+          각 에이전트가 독립 브랜치에서 동시에 커밋 → PR로 main에 통합. 에이전트 간 파일 충돌 없음.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="doc-divider">
+
+  <!-- ── SECTION 5: 언제 쓸지 ── -->
+  <div class="doc-section">
+    <div class="doc-section-title"><div class="ds-num">5</div>단일 vs 멀티에이전트 — 언제 쓸까</div>
+    <div class="doc-section-sub">복잡도보다 병렬 가능성이 더 중요한 판단 기준</div>
+
+    <div style="overflow-x:auto;border-radius:var(--r);border:0.5px solid var(--border)">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th>기준</th>
+            <th>단일 에이전트</th>
+            <th>멀티에이전트</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>작업 규모</td><td class="cmp-good">소~중형</td><td class="cmp-good">대형 · 복잡</td></tr>
+          <tr><td>단계 독립성</td><td class="cmp-neu">순차 의존</td><td class="cmp-good">병렬 가능</td></tr>
+          <tr><td>컨텍스트 요구량</td><td class="cmp-good">단일 윈도우 내</td><td class="cmp-good">초과 시 유리</td></tr>
+          <tr><td>구현 복잡도</td><td class="cmp-good">낮음</td><td class="cmp-bad">높음</td></tr>
+          <tr><td>비용</td><td class="cmp-good">낮음</td><td class="cmp-bad">에이전트 수만큼 증가</td></tr>
+          <tr><td>디버깅</td><td class="cmp-good">단순</td><td class="cmp-bad">오류 전파 추적 필요</td></tr>
+          <tr><td>적합 예시</td><td class="cmp-neu">요약, Q&A, 코드 리뷰</td><td class="cmp-neu">RFP 분석, 대규모 리서치</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="doc-divider">
+
+  <!-- ── SECTION 6: 배포 흐름 ── -->
+  <div class="doc-section">
+    <div class="doc-section-title"><div class="ds-num">6</div>AgentFit 개발 → 배포 흐름</div>
+    <div class="doc-section-sub">Claude.ai 아티팩트 → Claude Code → GitHub → 웹 서비스</div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Claude.ai 아티팩트로 프로토타입</div>
+          <div class="step-desc">지금처럼 대화로 빠르게 HTML/JS 프로토타입 제작. API 호출 테스트도 claude.ai 환경에서 즉시 가능.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Claude Code로 로컬 프로젝트화</div>
+          <div class="step-desc">HTML 파일을 받아 폴더 구조 분리 (index.html, styles.css, app.js). Claude Code에게 "기능 추가해줘" 명령으로 이어서 개발.</div>
+          <div class="code-block" style="margin-top:8px;font-size:10px">mkdir maeval && cd maeval
+# Claude Code 터미널에서
+claude "이 HTML을 React 프로젝트로 분리해줘"</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">GitHub 푸시</div>
+          <div class="step-desc">Git 저장소 초기화 후 GitHub에 업로드. 팀 협업 시 Git Worktree로 에이전트별 브랜치 분리.</div>
+          <div class="code-block" style="margin-top:8px;font-size:10px">git init && git add . && git commit -m "init: AgentFit prototype"
+git remote add origin https://github.com/yourname/maeval.git
+git push -u origin main</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">GitHub Pages / Vercel 배포</div>
+          <div class="step-desc">GitHub Settings → Pages → main 브랜치 선택으로 즉시 무료 배포. 또는 Vercel/Netlify 연결 시 push마다 자동 배포.</div>
+          <div class="chip-row">
+            <span class="chip c-green">무료 호스팅</span>
+            <span class="chip c-blue">HTTPS 자동</span>
+            <span class="chip c-accent">Push → 자동 배포</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .doc-wrap -->
+</div><!-- #page-doc -->
+
+
+<!-- ════════════════════════════════════
+     FOOTER
+════════════════════════════════════ -->
+<div style="max-width:860px;margin:0 auto">
+  <footer class="site-footer">
+    <div class="footer-left">
+      <span>AgentFit v0.1 prototype</span>
+      <span>·</span>
+      <span>멀티에이전트 도입 평가 도구</span>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" onclick="showPage('doc')">Docs</a>
+      <a class="footer-link" href="https://docs.anthropic.com" target="_blank">Anthropic API</a>
+      <a class="footer-link" href="https://github.com" target="_blank">GitHub</a>
+    </div>
+  </footer>
+</div>
+
+
+<!-- ════════════════════════════════════
+     SCRIPT
+════════════════════════════════════ -->
+<script>
+// ── DATA ──────────────────────────────
+const Qs = [
+  { id:'q1', label:'작업이 독립적인 여러 단계로 나뉘는가?',           hint:'예: 조사 → 분석 → 작성처럼 명확히 구분되는 단계',          g:'c', w:2 },
+  { id:'q2', label:'각 단계가 서로 다른 전문성을 요구하는가?',         hint:'예: 리서처 역할과 법률 검토 역할이 동시에 필요한 경우',      g:'c', w:2 },
+  { id:'q3', label:'단일 컨텍스트 윈도우에 담기 어려운 양인가?',       hint:'예: 수십 개 문서를 동시에 처리해야 하는 경우',               g:'c', w:1 },
+  { id:'q4', label:'일부 단계를 동시에 실행해도 결과에 영향 없는가?',  hint:'예: A 지역 조사와 B 지역 조사를 동시에 진행 가능',           g:'p', w:3 },
+  { id:'q5', label:'각 서브태스크가 앞 단계 없이도 시작 가능한가?',    hint:'예: 마케팅 분석과 기술 검토를 독립적으로 시작 가능',         g:'p', w:2 },
+  { id:'q6', label:'에러 발생 시 일부만 재실행하면 되는가?',           hint:'예: 5개 중 1개만 실패해도 나머지는 유효한 경우',             g:'p', w:1 },
+  { id:'q7', label:'에이전트 간 조율 비용이 이점보다 크지 않은가?',    hint:'단순 요약 같은 경우 오버헤드가 이점을 초과할 수 있음',       g:'o', w:2 },
+  { id:'q8', label:'에이전트 오류 전파 시 복구가 가능한가?',           hint:'한 에이전트 오류가 전체를 망가뜨리지 않는 구조인가',         g:'o', w:2 },
+  { id:'q9', label:'반복 실행 또는 자동화가 필요한 작업인가?',         hint:'일회성보다 파이프라인화할 가치가 있는 작업인가',             g:'o', w:1 },
+];
+
+const Providers = [
+  { id:'claude',   name:'Claude',    icon:'🟠', type:'Cloud API', models:['claude-sonnet-4-20250514','claude-opus-4-20250514','claude-haiku-4-5-20251001'], key:true,  base:'https://api.anthropic.com' },
+  { id:'openai',   name:'OpenAI',    icon:'⚫', type:'Cloud API', models:['gpt-4o','gpt-4o-mini','gpt-4-turbo'], key:true, base:'https://api.openai.com' },
+  { id:'gemini',   name:'Gemini',    icon:'🔵', type:'Cloud API', models:['gemini-2.0-flash','gemini-1.5-pro','gemini-1.5-flash'], key:true, base:'' },
+  { id:'ollama',   name:'Ollama',    icon:'🦙', type:'Local',     models:['llama3.2','mistral','qwen2.5'], key:false, base:'http://localhost:11434' },
+  { id:'lmstudio', name:'LM Studio', icon:'🖥', type:'Local',     models:['local-model'], key:false, base:'http://localhost:1234' },
+  { id:'custom',   name:'Custom',    icon:'⚙️', type:'Custom',    models:[], key:false, base:'' },
+];
+
+const qState = {};
+let chatHistory = [];
+let scores = { c:0, p:0, o:0 };
+let vClass = 'vn', vTitle = '미완료';
+let cfg = { provider:'claude', apiKey:'', model:'', baseUrl:'', customModel:'' };
+
+// ── PAGE ROUTER ───────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('nav-app').classList.toggle('active', id === 'app');
+  document.getElementById('nav-doc').classList.toggle('active', id === 'doc');
+}
+
+// ── APP TABS ──────────────────────────
+function switchTab(id) {
+  const tabs = ['survey','consult','settings'];
+  document.querySelectorAll('.app-tab').forEach((t,i) => t.classList.toggle('active', tabs[i]===id));
+  document.querySelectorAll('.app-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (id === 'consult') updateSummary();
+}
+
+// ── SURVEY ────────────────────────────
+function renderQs() {
+  const el = document.getElementById('q-list');
+  el.innerHTML = '';
+  Qs.forEach(q => {
+    const v = qState[q.id];
+    const d = document.createElement('div');
+    d.className = 'q-card' + (v===true?' y':'');
+    d.innerHTML = `
+      <div class="q-pip"></div>
+      <div class="q-body">
+        <div class="q-top">
+          <span class="q-chip">${q.g==='c'?'복잡도':q.g==='p'?'병렬':'오버헤드'}</span>
+          <span class="q-label">${q.label}</span>
+        </div>
+        <div class="q-hint">${q.hint}</div>
+      </div>
+      <div class="q-tog">
+        <button class="tog${v===true?' y':''}" onclick="setQ('${q.id}',true)">예</button>
+        <button class="tog${v===false?' n':''}" onclick="setQ('${q.id}',false)">아니오</button>
+      </div>`;
+    el.appendChild(d);
+  });
+}
+
+function setQ(id, val) {
+  qState[id] = val;
+  renderQs();
+  calcScores();
+}
+
+function calcScores() {
+  let cv=0,cm=0, pv=0,pm=0, ov=0,om=0;
+  Qs.forEach(q => {
+    const v = qState[q.id];
+    if(q.g==='c'){cm+=q.w;if(v===true)cv+=q.w;}
+    else if(q.g==='p'){pm+=q.w;if(v===true)pv+=q.w;}
+    else{om+=q.w;if(v===true)ov+=q.w;}
+  });
+  scores.c = cm?Math.round(cv/cm*100):0;
+  scores.p = pm?Math.round(pv/pm*100):0;
+  scores.o = om?Math.round(ov/om*100):0;
+
+  ['c','p','o'].forEach(k=>{
+    document.getElementById('b'+k).style.width=scores[k]+'%';
+    document.getElementById('p'+k).textContent=scores[k]+'%';
+  });
+
+  const done = Qs.filter(q=>qState[q.id]!==undefined).length;
+  const vEl = document.getElementById('verdict');
+  const gb  = document.getElementById('go-btn');
+
+  if(done < Qs.length) {
+    vEl.className='verdict vn';
+    vEl.innerHTML=`<div class="v-head"><div class="v-dot"></div><div class="v-title">${done}/9 완료 — 모두 답하면 결과가 표시됩니다</div></div>`;
+    gb.classList.remove('show'); vClass='vn'; vTitle='미완료'; return;
+  }
+
+  const s = scores.c*.35 + scores.p*.45 + scores.o*.2;
+  let cls,title,desc;
+  if(s>=70){cls='vx';title='멀티에이전트 적합';desc=`복잡도 ${scores.c}% · 병렬 ${scores.p}% · 오버헤드 ${scores.o}%. 오케스트레이터 + 전문 서브에이전트 구성을 권장합니다.`;}
+  else if(s>=45){cls='vm';title='선택적 적용 검토 필요';desc=`일부 기준만 충족. 단일 Claude로 먼저 시도 후 한계가 느껴질 때 전환을 권장합니다.`;}
+  else{cls='vs';title='단일 에이전트로 충분';desc=`오버헤드가 이점보다 클 수 있습니다. 잘 설계된 단일 프롬프트로 처리하세요.`;}
+
+  vClass=cls; vTitle=title;
+  vEl.className='verdict '+cls;
+  vEl.innerHTML=`<div class="v-head"><div class="v-dot"></div><div class="v-title">${title}</div></div><div class="v-desc">${desc}</div>`;
+  gb.classList.add('show');
+}
+
+// ── CONSULTING ────────────────────────
+function updateSummary() {
+  document.getElementById('s-c').textContent = scores.c+'%';
+  document.getElementById('s-p').textContent = scores.p+'%';
+  document.getElementById('s-o').textContent = scores.o+'%';
+  const sb = document.getElementById('s-v');
+  sb.textContent = vTitle;
+  sb.className = 'sum-badge ' + (vClass==='vx'?'sb-multi':vClass==='vs'?'sb-single':vClass==='vm'?'sb-maybe':'sb-none');
+  const hasApi = cfg.apiKey || ['ollama','lmstudio'].includes(cfg.provider);
+  document.getElementById('api-warn').classList.toggle('show', !hasApi);
+}
+
+function addMsg(role, text, typing=false) {
+  const box = document.getElementById('chat-box');
+  const empty = document.getElementById('chat-empty');
+  if(empty) empty.style.display='none';
+  const m = document.createElement('div');
+  m.className = 'msg ' + (role==='user'?'u':'a');
+  m.innerHTML = `<div class="av">${role==='user'?'You':'AI'}</div><div class="bub${typing?' typing':''}">${text.replace(/\n/g,'<br>')}</div>`;
+  box.appendChild(m);
+  box.scrollTop = box.scrollHeight;
+  return m;
+}
+
+async function sendMsg() {
+  const inp = document.getElementById('chat-in');
+  const text = inp.value.trim();
+  if(!text) return;
+  inp.value='';
+  document.getElementById('send-btn').disabled=true;
+  addMsg('user', text);
+  chatHistory.push({role:'user',content:text});
+  const typing = addMsg('ai','답변 생성 중...',true);
+  try {
+    const reply = await callAI(chatHistory);
+    typing.querySelector('.bub').classList.remove('typing');
+    typing.querySelector('.bub').innerHTML = reply.replace(/\n/g,'<br>');
+    chatHistory.push({role:'assistant',content:reply});
+  } catch(e) {
+    typing.querySelector('.bub').innerHTML = `<span style="color:var(--accent)">오류: ${e.message}</span>`;
+  }
+  document.getElementById('send-btn').disabled=false;
+  document.getElementById('chat-box').scrollTop=99999;
+}
+
+function buildSys() {
+  const yes = Qs.filter(q=>qState[q.id]===true).map(q=>q.label);
+  const no  = Qs.filter(q=>qState[q.id]===false).map(q=>q.label);
+  return `당신은 멀티에이전트 시스템 아키텍처 전문 컨설턴트입니다. 한국어로 답변하세요.
+사전 설문 결과: 복잡도 ${scores.c}%, 병렬 가능성 ${scores.p}%, 오버헤드 ${scores.o}%, 1차 판단: ${vTitle}
+해당 항목: ${yes.join(', ')||'없음'}
+미해당 항목: ${no.join(', ')||'없음'}
+프로젝트 설명을 듣고 3~5번 대화로 심층 평가 후 최종 권고(단일/멀티에이전트)와 구체적 구현 방향을 제시하세요. 답변은 실용적으로 간결하게.`;
+}
+
+async function callAI(messages) {
+  const pv = Providers.find(p=>p.id===cfg.provider);
+  const model = cfg.model || pv?.models[0] || '';
+  const sys = buildSys();
+  if(cfg.provider==='claude') {
+    if(!cfg.apiKey) throw new Error('Claude API Key를 설정해주세요');
+    const r = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':cfg.apiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model,max_tokens:1000,system:sys,messages})});
+    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||r.statusText);}
+    return (await r.json()).content[0].text;
+  }
+  if(cfg.provider==='gemini') {
+    if(!cfg.apiKey) throw new Error('Gemini API Key를 설정해주세요');
+    const gm = messages.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}));
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${cfg.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:sys}]},contents:gm})});
+    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||r.statusText);}
+    return (await r.json()).candidates[0].content.parts[0].text;
+  }
+  const base = cfg.baseUrl || pv?.base || '';
+  if(!base) throw new Error('Base URL을 설정해주세요');
+  const hdrs = {'Content-Type':'application/json'};
+  if(cfg.apiKey) hdrs['Authorization']='Bearer '+cfg.apiKey;
+  const r = await fetch(base+'/v1/chat/completions',{method:'POST',headers:hdrs,body:JSON.stringify({model:cfg.customModel||model,messages:[{role:'system',content:sys},...messages],max_tokens:1000})});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||r.statusText);}
+  return (await r.json()).choices[0].message.content;
+}
+
+// ── SETTINGS ──────────────────────────
+function renderProvs() {
+  const el = document.getElementById('prov-grid');
+  el.innerHTML='';
+  Providers.forEach(p=>{
+    const c=document.createElement('div');
+    c.className='prov-card'+(cfg.provider===p.id?' sel':'');
+    c.onclick=()=>{cfg.provider=p.id;renderProvs();renderFields();};
+    c.innerHTML=`<div class="prov-icon">${p.icon}</div><div class="prov-name">${p.name}</div><div class="prov-type">${p.type}</div>`;
+    el.appendChild(c);
+  });
+}
+
+function renderFields() {
+  const pv = Providers.find(p=>p.id===cfg.provider);
+  if(!pv) return;
+  let h = `<div class="sec" style="margin-bottom:10px">${pv.name} 설정</div>`;
+  if(pv.key) h+=`<div class="field-row"><div class="field-lbl">API Key <span class="fbadge">필수</span></div><input class="field-in" type="password" id="f-key" placeholder="sk-..." value="${cfg.apiKey}"/></div>`;
+  if(pv.models.length>0) h+=`<div class="field-row"><div class="field-lbl">모델</div><select class="field-sel" id="f-model">${pv.models.map(m=>`<option value="${m}"${cfg.model===m?' selected':''}>${m}</option>`).join('')}</select></div>`;
+  if(['ollama','lmstudio','custom'].includes(pv.id)) {
+    h+=`<div class="field-row"><div class="field-lbl">Base URL <span class="fbadge">${pv.id==='custom'?'필수':'기본값 사용 가능'}</span></div><input class="field-in" id="f-base" placeholder="${pv.base||'http://localhost:포트'}" value="${cfg.baseUrl||pv.base}"/></div>`;
+    h+=`<div class="field-row"><div class="field-lbl">모델명 <span class="fbadge">직접 입력</span></div><input class="field-in" id="f-cmodel" placeholder="예: llama3.2, qwen2.5-coder" value="${cfg.customModel}"/></div>`;
+  }
+  document.getElementById('api-fields').innerHTML=h;
+}
+
+function saveSettings() {
+  const pv = Providers.find(p=>p.id===cfg.provider);
+  cfg.apiKey      = document.getElementById('f-key')?.value||'';
+  cfg.model       = document.getElementById('f-model')?.value||(pv?.models[0]||'');
+  cfg.baseUrl     = document.getElementById('f-base')?.value||(pv?.base||'');
+  cfg.customModel = document.getElementById('f-cmodel')?.value||'';
+  localStorage.setItem('agentfit_cfg', JSON.stringify(cfg));
+  const ok = document.getElementById('saved-ok');
+  ok.classList.add('show');
+  setTimeout(()=>ok.classList.remove('show'),2000);
+}
+
+function loadSettings() {
+  const s = localStorage.getItem('agentfit_cfg');
+  if(s){try{Object.assign(cfg,JSON.parse(s));}catch(e){}}
+}
+
+// ── KEYBOARD ──────────────────────────
+document.addEventListener('keydown', e=>{
+  const inp = document.getElementById('chat-in');
+  if(document.activeElement===inp && e.key==='Enter' && !e.shiftKey){
+    e.preventDefault(); sendMsg();
+  }
+});
+
+// ── INIT ──────────────────────────────
+loadSettings();
+renderQs();
+renderProvs();
+renderFields();
+</script>
+</body>
+</html>
