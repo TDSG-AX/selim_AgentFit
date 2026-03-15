@@ -2,7 +2,7 @@
 
 > 내 작업에 멀티에이전트가 맞는지 평가하고, AI와 대화로 아키텍처를 컨설팅받는 도구
 
-**GitHub Pages** → `[https://tdsg-ax.github.io/selim_AgentFit/](https://tdsg-ax.github.io/selim_AgentFit/)`
+**데모** → [https://tdsg-ax.github.io/selim_AgentFit/](https://tdsg-ax.github.io/selim_AgentFit/)
 
 ---
 
@@ -127,32 +127,6 @@ Ctrl + C
 
 ---
 
-## GitHub Pages 배포
-
-### 1. 저장소 Push 확인
-
-```bash
-git push origin main
-```
-
-### 2. GitHub Pages 활성화
-
-1. GitHub 저장소 → **Settings** → **Pages**
-2. **Source**: `Deploy from a branch`
-3. **Branch**: `main` / `/ (root)`
-4. **Save**
-
-### 3. 배포 URL
-
-```
-https://tdsg-ax.github.io/selim_AgentFit/          # 평가 도구
-https://tdsg-ax.github.io/selim_AgentFit/doc.html  # 방법론 가이드
-```
-
-> GitHub Pages에서는 Claude를 제외한 나머지 제공자를 사용하세요.
-> Claude는 로컬 `server.js` 실행 환경에서만 동작합니다.
-
----
 
 ## 버전 히스토리
 
