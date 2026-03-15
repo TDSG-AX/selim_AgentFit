@@ -268,6 +268,29 @@ body{font-family:'Gabarito',system-ui,sans-serif;background:var(--bg);color:var(
 .footer-links{display:flex;gap:16px;}
 .footer-link{font-size:12px;color:var(--text3);cursor:pointer;transition:color .15s;}
 .footer-link:hover{color:var(--text);}
+/* git timeline */
+.git-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r); padding: 20px; font-family: 'DM Mono', monospace; }
+.git-timeline { position: relative; }
+.git-branch-row { display: flex; align-items: center; gap: 0; margin-bottom: 14px; position: relative; }
+.git-branch-row:last-child { margin-bottom: 0; }
+.git-label { font-size: 10px; width: 110px; flex-shrink: 0; }
+.git-label.main   { color: var(--accent); }
+.git-label.agent1 { color: var(--blue); }
+.git-label.agent2 { color: var(--green); }
+.git-label.agent3 { color: var(--purple); }
+.git-line { flex: 1; height: 2px; position: relative; border-radius: 1px; }
+.git-line.main   { background: rgba(201,100,66,0.3); }
+.git-line.agent1 { background: rgba(59,111,212,0.3); }
+.git-line.agent2 { background: rgba(42,122,82,0.3); }
+.git-line.agent3 { background: rgba(107,70,193,0.3); }
+.git-commits { display: flex; align-items: center; gap: 0; position: absolute; top: -5px; left: 0; right: 0; }
+.gc { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; flex-shrink: 0; cursor: default; }
+.gc.main   { background: var(--accent); }
+.gc.agent1 { background: var(--blue); }
+.gc.agent2 { background: var(--green); }
+.gc.agent3 { background: var(--purple); }
+.gc-gap { flex: 1; }
+.git-note { font-size: 10px; color: var(--text3); margin-top: 12px; line-height: 1.6; }
 </style>
 
 <style>
@@ -511,40 +534,73 @@ main
         </div>
       </div>
     </div>
+
+    <div style="margin-top:16px;">
+      <div class="sec-label" style="margin-bottom:14px;">Git Worktree × 에이전트 팀 타임라인</div>
+      <div class="git-wrap">
+        <div class="git-timeline">
+          <div class="git-branch-row">
+            <span class="git-label main">main (통합)</span>
+            <div style="flex:1;position:relative;height:12px">
+              <div class="git-line main" style="position:absolute;top:5px;left:0;right:0"></div>
+              <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center">
+                <div class="gc main"></div><div class="gc-gap"></div>
+                <div class="gc main" style="margin-left:60%"></div><div class="gc-gap"></div>
+                <div class="gc main" style="position:absolute;right:0"></div>
+              </div>
+            </div>
+            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">← PR merge</span>
+          </div>
+          <div class="git-branch-row">
+            <span class="git-label agent1">agent/research</span>
+            <div style="flex:1;position:relative;height:12px">
+              <div class="git-line agent1" style="position:absolute;top:5px;left:5%;right:30%"></div>
+              <div style="position:absolute;top:0;left:5%;display:flex;align-items:center;gap:0">
+                <div class="gc agent1"></div>
+                <div style="width:60px"></div>
+                <div class="gc agent1"></div>
+                <div style="width:40px"></div>
+                <div class="gc agent1"></div>
+              </div>
+            </div>
+            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">조사 완료</span>
+          </div>
+          <div class="git-branch-row">
+            <span class="git-label agent2">agent/analysis</span>
+            <div style="flex:1;position:relative;height:12px">
+              <div class="git-line agent2" style="position:absolute;top:5px;left:5%;right:20%"></div>
+              <div style="position:absolute;top:0;left:5%;display:flex;align-items:center;gap:0">
+                <div class="gc agent2"></div>
+                <div style="width:80px"></div>
+                <div class="gc agent2"></div>
+                <div style="width:50px"></div>
+                <div class="gc agent2"></div>
+              </div>
+            </div>
+            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">분석 완료</span>
+          </div>
+          <div class="git-branch-row">
+            <span class="git-label agent3">agent/writer</span>
+            <div style="flex:1;position:relative;height:12px">
+              <div class="git-line agent3" style="position:absolute;top:5px;left:5%;right:5%"></div>
+              <div style="position:absolute;top:0;left:5%;display:flex;align-items:center;gap:0">
+                <div class="gc agent3"></div>
+                <div style="width:100px"></div>
+                <div class="gc agent3"></div>
+                <div style="width:80px"></div>
+                <div class="gc agent3"></div>
+              </div>
+            </div>
+            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">작성 중</span>
+          </div>
+        </div>
+        <div class="git-note">
+          각 에이전트가 독립 브랜치에서 동시에 커밋 → PR로 main에 통합. 에이전트 간 파일 충돌 없음.
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- ⑤ 도구 선택 가이드 -->
-  <div class="doc-section">
-    <div class="doc-section-label">05 — 도구 선택</div>
-    <div class="doc-section-title">상황별 추천 도구</div>
-    <div class="doc-section-desc">멀티에이전트 시스템을 구현하는 방법은 여럿입니다. 목적과 규모에 따라 올바른 도구를 선택하세요.</div>
-    <div class="concept-grid">
-      <div class="concept-card">
-        <div class="concept-icon" style="background:var(--accent-bg);">💬</div>
-        <div class="concept-title">Claude.ai 대화</div>
-        <div class="concept-desc">가장 빠른 시도. 프롬프트로 역할을 나눠 단계적으로 요청. 구현 불필요. 병렬 처리 불가.</div>
-      </div>
-      <div class="concept-card">
-        <div class="concept-icon" style="background:var(--blue-bg);">⚙️</div>
-        <div class="concept-title">n8n / Make</div>
-        <div class="concept-desc">노코드 워크플로우. HTTP 노드로 Claude API 호출 연결. 이미 익숙하다면 진입 장벽 낮음.</div>
-      </div>
-      <div class="concept-card">
-        <div class="concept-icon" style="background:var(--green-bg);">💻</div>
-        <div class="concept-title">Claude Code</div>
-        <div class="concept-desc">터미널 기반 에이전트. 파일·코드·웹 검색 자율 처리. Git Worktree 연동에 최적.</div>
-      </div>
-      <div class="concept-card">
-        <div class="concept-icon" style="background:var(--purple-bg);">🔗</div>
-        <div class="concept-title">API + LangGraph</div>
-        <div class="concept-desc">복잡한 에이전트 그래프 구성. 상태 관리·조건 분기·루프 등 고급 오케스트레이션 필요 시.</div>
-      </div>
-    </div>
-    <div class="callout" style="background:var(--blue-bg);border-color:rgba(59,108,245,.25);border-left-color:var(--blue);margin-top:16px;">
-      <div class="callout-title" style="color:var(--blue);">AgentFit 다음 단계</div>
-      <div class="callout-desc">이 도구로 평가 후 → Claude Code로 구조화 → GitHub에 Push → GitHub Pages / Vercel로 배포. 컨설팅 기능을 위해 API 설정 탭에서 원하는 AI 제공자를 등록하세요.</div>
-    </div>
-  </div>
 
 </div><!-- /page-doc -->
 
