@@ -87,7 +87,6 @@ body {
   background: var(--accent-bg); transition: all .13s; font-family: inherit;
 }
 .nav-doc:hover { background: var(--accent-lt); }
-.nav-doc.active { background: var(--accent-lt); border-color: rgba(201,100,66,0.5); }
 
 /* ── FOOTER ── */
 .site-footer {
@@ -494,7 +493,7 @@ hr.light { border: none; border-top: 0.5px solid var(--border); margin: 18px 0; 
     <nav class="nav">
       <button class="nav-btn active" id="nav-app" onclick="showPage('app')">평가 도구</button>
       <div class="nav-sep"></div>
-      <button class="nav-doc" id="nav-doc" onclick="showPage('doc')">Docs ↗</button>
+      <a class="nav-doc" href="doc.html" target="_blank">Docs ↗</a>
     </nav>
   </div>
 </header>
@@ -572,313 +571,6 @@ hr.light { border: none; border-top: 0.5px solid var(--border); margin: 18px 0; 
 </div><!-- #page-app -->
 
 
-<!-- ════════════════════════════════════
-     PAGE: DOC
-════════════════════════════════════ -->
-<div class="page" id="page-doc">
-<div class="doc-wrap">
-
-  <div class="doc-hero">
-    <div class="doc-eyebrow">AgentFit · Documentation</div>
-    <h1 class="doc-title">서브에이전트 &amp; 멀티에이전트<br>일하는 방식 가이드</h1>
-    <p class="doc-lead">AI 에이전트가 팀을 이루어 협업하는 구조, 작업 분배 방법론, Git Worktree를 활용한 병렬 개발 전략을 시각적으로 정리합니다.</p>
-  </div>
-
-  <!-- ── SECTION 1: 개념 ── -->
-  <div class="doc-section">
-    <div class="doc-section-title"><div class="ds-num">1</div>핵심 개념</div>
-    <div class="doc-section-sub">오케스트레이터, 서브에이전트, 서브태스크의 관계</div>
-
-    <div class="info-row cols3" style="margin-bottom:10px">
-      <div class="info-card accent">
-        <div class="info-card-icon">🧠</div>
-        <div class="info-card-title">오케스트레이터</div>
-        <div class="info-card-body">전체 목표를 이해하고 작업을 분해해 서브에이전트에게 위임. 결과를 수집·통합해 최종 산출물을 만드는 지휘자.</div>
-      </div>
-      <div class="info-card blue">
-        <div class="info-card-icon">⚙️</div>
-        <div class="info-card-title">서브에이전트</div>
-        <div class="info-card-body">특정 역할(리서처, 분석가, 코더 등)로 특화된 독립 Claude 인스턴스. 자신에게 할당된 서브태스크만 알고 수행.</div>
-      </div>
-      <div class="info-card green">
-        <div class="info-card-icon">📋</div>
-        <div class="info-card-title">서브태스크</div>
-        <div class="info-card-body">오케스트레이터가 분해한 작업 단위. 각 서브태스크는 명확한 입력·출력이 있으며 서브에이전트 1개가 담당.</div>
-      </div>
-    </div>
-
-    <div class="info-card" style="margin-top:0">
-      <div class="info-card-title" style="margin-bottom:10px">오케스트레이터 → 서브에이전트 흐름</div>
-      <div class="parallel-wrap" style="background:var(--bg);border:none;padding:16px 0 0">
-        <div class="parallel-row">
-          <div style="display:flex;flex-direction:column;align-items:center">
-            <div class="p-box orch">🧠 오케스트레이터</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:5px;font-family:'DM Mono',monospace">태스크 분해 · 결과 통합</div>
-          </div>
-          <div class="p-center">
-            <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
-              <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:2px">서브태스크 위임</div>
-              <div style="width:60px;height:0.5px;background:var(--border2)"></div>
-              <div style="font-size:16px;color:var(--text3)">→</div>
-            </div>
-          </div>
-          <div class="parallel-split">
-            <div class="parallel-line"><div class="p-box sub1">🔍 리서처</div><span style="font-size:10px;color:var(--text3);margin-left:8px">정보 수집 · 팩트 조사</span></div>
-            <div class="parallel-line"><div class="p-box sub2">📊 분석가</div><span style="font-size:10px;color:var(--text3);margin-left:8px">데이터 분석 · 인사이트</span></div>
-            <div class="parallel-line"><div class="p-box sub3">✍️ 작성자</div><span style="font-size:10px;color:var(--text3);margin-left:8px">문서화 · 보고서 작성</span></div>
-          </div>
-          <div class="p-center">
-            <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
-              <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:2px">결과 반환</div>
-              <div style="width:60px;height:0.5px;background:var(--border2)"></div>
-              <div style="font-size:16px;color:var(--text3)">→</div>
-            </div>
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center">
-            <div class="p-box merge">📄 최종 산출물</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:5px;font-family:'DM Mono',monospace">통합 보고서</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <hr class="doc-divider">
-
-  <!-- ── SECTION 2: 컨텍스트 전달 ── -->
-  <div class="doc-section">
-    <div class="doc-section-title"><div class="ds-num">2</div>컨텍스트 전달 방식</div>
-    <div class="doc-section-sub">에이전트 간 메모리 없음 — 매 호출마다 결과를 명시적으로 전달해야 함</div>
-
-    <div class="info-row cols2" style="margin-bottom:12px">
-      <div class="info-card amber">
-        <div class="info-card-title">⚠ 핵심 제약</div>
-        <div class="info-card-body">Claude는 API 호출 간 메모리가 없습니다. 에이전트끼리 "직접 대화"하는 게 아니라, 항상 <strong>코드(또는 n8n)</strong>가 이전 결과를 다음 호출의 메시지에 포함시켜 전달합니다.</div>
-      </div>
-      <div class="info-card blue">
-        <div class="info-card-title">✓ 해결 패턴</div>
-        <div class="info-card-body">각 서브에이전트 호출 시 system prompt에 역할을, user message에 "이전 에이전트 결과 + 새 지시"를 함께 담아 전달. 히스토리 배열로 대화 맥락을 누적 관리.</div>
-      </div>
-    </div>
-
-    <div class="code-block">// 컨텍스트 체이닝 패턴
-const research = await callAgent("리서처", task);
-
-const analysis = await callAgent("분석가",
-  `원래 태스크: ${task}
-   리서처 결과: ${research}   ← 이전 결과를 명시적으로 포함
-   위 내용을 분석하세요.`
-);
-
-const report = await callAgent("오케스트레이터",
-  `태스크: ${task}
-   리서처: ${research}
-   분석가: ${analysis}
-   최종 보고서를 작성하세요.`
-);</div>
-  </div>
-
-  <hr class="doc-divider">
-
-  <!-- ── SECTION 3: 병렬 실행 ── -->
-  <div class="doc-section">
-    <div class="doc-section-title"><div class="ds-num">3</div>순차 vs 병렬 실행 패턴</div>
-    <div class="doc-section-sub">서브태스크 간 의존성이 없으면 Promise.all로 동시에 실행해 시간을 단축</div>
-
-    <div class="info-row cols2" style="margin-bottom:12px">
-      <div class="info-card">
-        <div class="info-card-title">순차 실행 (Sequential)</div>
-        <div class="info-card-body" style="margin-top:6px">A → B → C 순서로 하나씩 실행. 앞 단계 결과가 다음 단계의 입력이 되는 경우 사용.</div>
-        <div class="code-block" style="margin-top:10px;font-size:10px">const r1 = await agent1(task);
-const r2 = await agent2(r1);
-const r3 = await agent3(r2);</div>
-      </div>
-      <div class="info-card green">
-        <div class="info-card-title">병렬 실행 (Parallel)</div>
-        <div class="info-card-body" style="margin-top:6px">독립적인 서브태스크를 동시에 실행. 전체 시간 = 가장 오래 걸리는 에이전트 시간.</div>
-        <div class="code-block" style="margin-top:10px;font-size:10px">const [r1, r2, r3] = await Promise.all([
-  agent1(task),
-  agent2(task),
-  agent3(task)
-]);</div>
-      </div>
-    </div>
-  </div>
-
-  <hr class="doc-divider">
-
-  <!-- ── SECTION 4: Git Worktree ── -->
-  <div class="doc-section">
-    <div class="doc-section-title"><div class="ds-num">4</div>Git Worktree × 멀티에이전트 개발</div>
-    <div class="doc-section-sub">각 AI 에이전트가 독립 브랜치에서 병렬로 작업 — 충돌 없이 동시 개발</div>
-
-    <div class="info-row cols2" style="margin-bottom:14px">
-      <div class="info-card">
-        <div class="info-card-title">Git Worktree란?</div>
-        <div class="info-card-body">하나의 Git 저장소에서 여러 브랜치를 <strong>동시에 다른 폴더</strong>에 체크아웃하는 기능. 브랜치 전환 없이 각 브랜치가 독립된 작업 디렉토리를 가짐.</div>
-        <div class="code-block" style="margin-top:10px;font-size:10px"># 에이전트별 worktree 생성
-git worktree add ../agent-research feature/research
-git worktree add ../agent-analysis feature/analysis
-git worktree add ../agent-writer   feature/writer</div>
-      </div>
-      <div class="info-card blue">
-        <div class="info-card-title">멀티에이전트와 결합하면?</div>
-        <div class="info-card-body">각 AI 에이전트(Claude Code 인스턴스)를 별도 worktree 폴더에서 실행하면, 서로 다른 파일을 동시에 수정해도 <strong>충돌이 발생하지 않음</strong>.</div>
-        <div class="chip-row">
-          <span class="chip c-green">충돌 없는 병렬 작업</span>
-          <span class="chip c-blue">독립 컨텍스트</span>
-          <span class="chip c-accent">PR로 통합</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="info-card" style="margin-bottom:0">
-      <div class="info-card-title" style="margin-bottom:14px">Git Worktree × 에이전트 팀 타임라인</div>
-      <div class="git-wrap">
-        <div class="git-timeline">
-          <div class="git-branch-row">
-            <span class="git-label main">main (통합)</span>
-            <div style="flex:1;position:relative;height:12px">
-              <div class="git-line main" style="position:absolute;top:5px;left:0;right:0"></div>
-              <div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center">
-                <div class="gc main"></div><div class="gc-gap"></div>
-                <div class="gc main" style="margin-left:60%"></div><div class="gc-gap"></div>
-                <div class="gc main" style="position:absolute;right:0"></div>
-              </div>
-            </div>
-            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">← PR merge</span>
-          </div>
-          <div class="git-branch-row">
-            <span class="git-label agent1">agent/research</span>
-            <div style="flex:1;position:relative;height:12px">
-              <div class="git-line agent1" style="position:absolute;top:5px;left:5%;right:30%"></div>
-              <div style="position:absolute;top:0;left:5%;display:flex;align-items:center;gap:0">
-                <div class="gc agent1"></div>
-                <div style="width:60px"></div>
-                <div class="gc agent1"></div>
-                <div style="width:40px"></div>
-                <div class="gc agent1"></div>
-              </div>
-            </div>
-            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">조사 완료</span>
-          </div>
-          <div class="git-branch-row">
-            <span class="git-label agent2">agent/analysis</span>
-            <div style="flex:1;position:relative;height:12px">
-              <div class="git-line agent2" style="position:absolute;top:5px;left:5%;right:20%"></div>
-              <div style="position:absolute;top:0;left:5%;display:flex;align-items:center;gap:0">
-                <div class="gc agent2"></div>
-                <div style="width:80px"></div>
-                <div class="gc agent2"></div>
-                <div style="width:50px"></div>
-                <div class="gc agent2"></div>
-              </div>
-            </div>
-            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">분석 완료</span>
-          </div>
-          <div class="git-branch-row">
-            <span class="git-label agent3">agent/writer</span>
-            <div style="flex:1;position:relative;height:12px">
-              <div class="git-line agent3" style="position:absolute;top:5px;left:5%;right:5%"></div>
-              <div style="position:absolute;top:0;left:5%;display:flex;align-items:center;gap:0">
-                <div class="gc agent3"></div>
-                <div style="width:100px"></div>
-                <div class="gc agent3"></div>
-                <div style="width:80px"></div>
-                <div class="gc agent3"></div>
-              </div>
-            </div>
-            <span style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:10px;width:90px">작성 중</span>
-          </div>
-        </div>
-        <div class="git-note">
-          각 에이전트가 독립 브랜치에서 동시에 커밋 → PR로 main에 통합. 에이전트 간 파일 충돌 없음.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <hr class="doc-divider">
-
-  <!-- ── SECTION 5: 언제 쓸지 ── -->
-  <div class="doc-section">
-    <div class="doc-section-title"><div class="ds-num">5</div>단일 vs 멀티에이전트 — 언제 쓸까</div>
-    <div class="doc-section-sub">복잡도보다 병렬 가능성이 더 중요한 판단 기준</div>
-
-    <div style="overflow-x:auto;border-radius:var(--r);border:0.5px solid var(--border)">
-      <table class="cmp-table">
-        <thead>
-          <tr>
-            <th>기준</th>
-            <th>단일 에이전트</th>
-            <th>멀티에이전트</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>작업 규모</td><td class="cmp-good">소~중형</td><td class="cmp-good">대형 · 복잡</td></tr>
-          <tr><td>단계 독립성</td><td class="cmp-neu">순차 의존</td><td class="cmp-good">병렬 가능</td></tr>
-          <tr><td>컨텍스트 요구량</td><td class="cmp-good">단일 윈도우 내</td><td class="cmp-good">초과 시 유리</td></tr>
-          <tr><td>구현 복잡도</td><td class="cmp-good">낮음</td><td class="cmp-bad">높음</td></tr>
-          <tr><td>비용</td><td class="cmp-good">낮음</td><td class="cmp-bad">에이전트 수만큼 증가</td></tr>
-          <tr><td>디버깅</td><td class="cmp-good">단순</td><td class="cmp-bad">오류 전파 추적 필요</td></tr>
-          <tr><td>적합 예시</td><td class="cmp-neu">요약, Q&A, 코드 리뷰</td><td class="cmp-neu">RFP 분석, 대규모 리서치</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <hr class="doc-divider">
-
-  <!-- ── SECTION 6: 배포 흐름 ── -->
-  <div class="doc-section">
-    <div class="doc-section-title"><div class="ds-num">6</div>AgentFit 개발 → 배포 흐름</div>
-    <div class="doc-section-sub">Claude.ai 아티팩트 → Claude Code → GitHub → 웹 서비스</div>
-
-    <div class="step-list">
-      <div class="step-item">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <div class="step-title">Claude.ai 아티팩트로 프로토타입</div>
-          <div class="step-desc">지금처럼 대화로 빠르게 HTML/JS 프로토타입 제작. API 호출 테스트도 claude.ai 환경에서 즉시 가능.</div>
-        </div>
-      </div>
-      <div class="step-item">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <div class="step-title">Claude Code로 로컬 프로젝트화</div>
-          <div class="step-desc">HTML 파일을 받아 폴더 구조 분리 (index.html, styles.css, app.js). Claude Code에게 "기능 추가해줘" 명령으로 이어서 개발.</div>
-          <div class="code-block" style="margin-top:8px;font-size:10px">mkdir maeval && cd maeval
-# Claude Code 터미널에서
-claude "이 HTML을 React 프로젝트로 분리해줘"</div>
-        </div>
-      </div>
-      <div class="step-item">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <div class="step-title">GitHub 푸시</div>
-          <div class="step-desc">Git 저장소 초기화 후 GitHub에 업로드. 팀 협업 시 Git Worktree로 에이전트별 브랜치 분리.</div>
-          <div class="code-block" style="margin-top:8px;font-size:10px">git init && git add . && git commit -m "init: AgentFit prototype"
-git remote add origin https://github.com/yourname/maeval.git
-git push -u origin main</div>
-        </div>
-      </div>
-      <div class="step-item">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <div class="step-title">GitHub Pages / Vercel 배포</div>
-          <div class="step-desc">GitHub Settings → Pages → main 브랜치 선택으로 즉시 무료 배포. 또는 Vercel/Netlify 연결 시 push마다 자동 배포.</div>
-          <div class="chip-row">
-            <span class="chip c-green">무료 호스팅</span>
-            <span class="chip c-blue">HTTPS 자동</span>
-            <span class="chip c-accent">Push → 자동 배포</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div><!-- .doc-wrap -->
-</div><!-- #page-doc -->
 
 
 <!-- ════════════════════════════════════
@@ -892,7 +584,7 @@ git push -u origin main</div>
       <span>멀티에이전트 도입 평가 도구</span>
     </div>
     <div class="footer-links">
-      <a class="footer-link" onclick="showPage('doc')">Docs</a>
+      <a class="footer-link" href="doc.html" target="_blank">Docs</a>
       <a class="footer-link" href="https://docs.anthropic.com" target="_blank">Anthropic API</a>
       <a class="footer-link" href="https://github.com" target="_blank">GitHub</a>
     </div>
@@ -937,7 +629,6 @@ function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   document.getElementById('nav-app').classList.toggle('active', id === 'app');
-  document.getElementById('nav-doc').classList.toggle('active', id === 'doc');
 }
 
 // ── APP TABS ──────────────────────────
