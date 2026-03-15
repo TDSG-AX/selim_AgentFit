@@ -612,7 +612,7 @@ const Qs = [
 const Providers = [
   { id:'claude',   name:'Claude',    icon:'🟠', type:'Cloud API', models:['claude-sonnet-4-20250514','claude-opus-4-20250514','claude-haiku-4-5-20251001'], key:true,  base:'https://api.anthropic.com' },
   { id:'openai',   name:'OpenAI',    icon:'⚫', type:'Cloud API', models:['gpt-4o','gpt-4o-mini','gpt-4-turbo'], key:true, base:'https://api.openai.com' },
-  { id:'gemini',   name:'Gemini',    icon:'🔵', type:'Cloud API', models:['gemini-2.0-flash','gemini-1.5-pro','gemini-1.5-flash'], key:true, base:'' },
+  { id:'gemini',   name:'Gemini',    icon:'🔵', type:'Cloud API', models:['gemini-2.5-flash-lite-preview-06-17','gemini-2.5-flash','gemini-2.0-flash','gemini-1.5-flash'], key:true, base:'' },
   { id:'ollama',   name:'Ollama',    icon:'🦙', type:'Local',     models:[], key:false, base:'http://localhost:11434' },
   { id:'lmstudio', name:'LM Studio', icon:'🖥', type:'Local',     models:[], key:false, base:'http://localhost:1234' },
   { id:'custom',   name:'Custom',    icon:'⚙️', type:'Custom',    models:[], key:false, base:'' },
@@ -824,7 +824,8 @@ async function callAI(messages) {
   if(cfg.provider==='gemini') {
     if(!cfg.apiKey) throw new Error('Gemini API Key를 설정해주세요');
     const gm = messages.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}));
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${cfg.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:sys}]},contents:gm})});
+    const activeModel = cfg.customModel || model;
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${cfg.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:sys}]},contents:gm})});
     if(!r.ok){const e=await r.json();throw new Error(e.error?.message||r.statusText);}
     return (await r.json()).candidates[0].content.parts[0].text;
   }
@@ -859,6 +860,9 @@ function renderFields() {
   if(['ollama','lmstudio','custom'].includes(pv.id)) {
     h+=`<div class="field-row"><div class="field-lbl">Base URL <span class="fbadge">${pv.id==='custom'?'필수':'기본값 사용 가능'}</span></div><input class="field-in" id="f-base" placeholder="${pv.base||'http://localhost:포트'}" value="${cfg.baseUrl||pv.base}"/></div>`;
     h+=`<div class="field-row"><div class="field-lbl">모델명 <span class="fbadge">직접 입력</span></div><input class="field-in" id="f-cmodel" placeholder="예: llama3.2, qwen2.5-coder" value="${cfg.customModel}"/></div>`;
+  }
+  if(pv.id==='gemini') {
+    h+=`<div class="field-row"><div class="field-lbl">모델명 직접 입력 <span class="fbadge">선택 — 위 목록 대신 사용</span></div><input class="field-in" id="f-cmodel" placeholder="예: gemini-2.5-flash-lite-preview-06-17" value="${cfg.customModel}"/></div>`;
   }
   document.getElementById('api-fields').innerHTML=h;
 }
